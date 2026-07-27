@@ -28,49 +28,60 @@
     if(!h) return;
   };
 
+  // ---- form groups (Form 3 kept separate from the Forms 1 & 2 review) ----
+  var GROUPS={ '12':{forms:[1,2], label:'Forms 1–2'}, '3':{forms:[3], label:'Form 3'} };
+  function groupOf(form){ return form===3?'3':'12'; }
+
   // ---- HOME / dashboard ----
   window.renderHome=function(){
-    var C=window.CURRICULUM, order=window.TOPIC_ORDER, prog=load();
-    var codes=order;
+    renderGroup('12','ring-12','meta-12','grid-12','Review progress');
+    renderGroup('3','ring-3','meta-3','grid-3','Form 3 progress');
+  };
+  function renderGroup(gkey,ringId,metaId,gridId,title){
+    var C=window.CURRICULUM, order=window.TOPIC_ORDER, prog=load(), forms=GROUPS[gkey].forms;
+    var codes=order.filter(function(c){return forms.indexOf(C[c].form)>-1;});
     var mastered=codes.filter(function(c){return (prog[c]||{}).status==='mastered';}).length;
     var inprog=codes.filter(function(c){return (prog[c]||{}).status==='progress';}).length;
-    var pct=Math.round(mastered/codes.length*100);
-    var ring=document.getElementById('ring');
+    var pct=codes.length?Math.round(mastered/codes.length*100):0;
+    var ring=document.getElementById(ringId);
     ring.style.setProperty('--p',pct); ring.querySelector('b').textContent=pct+'%';
-    document.getElementById('ovmeta').innerHTML=
-      '<h3>Your review progress</h3><p><b>'+mastered+'</b> of '+codes.length+
-      ' topics mastered · '+inprog+' in progress. Progress is saved on this device.</p>'+
+    document.getElementById(metaId).innerHTML=
+      '<h3>'+title+'</h3><p><b>'+mastered+'</b> of '+codes.length+
+      ' topics mastered · '+inprog+' in progress. Saved on this device.</p>'+
       '<div class="legend"><span><i class="dot m"></i>Mastered</span>'+
       '<span><i class="dot p"></i>In progress</span><span><i class="dot n"></i>Not started</span></div>';
-
-    var grid=document.getElementById('grid');
+    var grid=document.getElementById(gridId);
     window.STRANDS.forEach(function(s){
-      var tc=order.filter(function(c){return C[c].strandId===s.id;});
+      var tc=codes.filter(function(c){return C[c].strandId===s.id;});
+      if(!tc.length) return; // skip strands with no topics in this group
       var built=tc.filter(function(c){return C[c].content;}).length;
       var m=tc.filter(function(c){return (prog[c]||{}).status==='mastered';}).length;
       var col=strandColor(s.id);
-      var card=el('a','scard'); card.href='strand.html?s='+s.id; card.style.setProperty('--sc',col);
+      var card=el('a','scard'); card.href='strand.html?s='+s.id+'&g='+gkey; card.style.setProperty('--sc',col);
       card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:start;gap:8px">'+
-        '<div><h3>'+s.name+'</h3><div class="sub">'+tc.length+' topics · Forms 1–3</div></div>'+
+        '<div><h3>'+s.name+'</h3><div class="sub">'+tc.length+' topics · '+GROUPS[gkey].label+'</div></div>'+
         (built? '<span class="badge ready">Ready</span>':'<span class="badge soon">Soon</span>')+'</div>'+
         '<div class="bar"><i style="width:'+(m/tc.length*100)+'%"></i></div>'+
         '<div class="stat"><span>'+m+' / '+tc.length+' mastered</span><span>'+
         (built?built+' built':'coming soon')+'</span></div>';
       grid.appendChild(card);
     });
-  };
+  }
 
   // ---- STRAND page ----
   window.renderStrand=function(){
-    var C=window.CURRICULUM, id=+qp('s'), prog=load();
+    var C=window.CURRICULUM, id=+qp('s'), gkey=qp('g')||'12', prog=load();
+    var forms=(GROUPS[gkey]||GROUPS['12']).forms;
     var s=window.STRANDS.find(function(x){return x.id===id;});
     var col=strandColor(id);
-    document.getElementById('crumbs').innerHTML='<a href="index.html">Home</a> › '+s.name;
+    var glabel=gkey==='3'?'Form 3 · Current Year':'Forms 1 & 2 · Review';
+    document.getElementById('crumbs').innerHTML='<a href="index.html">Home</a> › <span style="color:'+col+'">'+glabel+'</span> › '+s.name;
     var head=document.getElementById('shead');
-    head.innerHTML='<h1 style="color:'+col+'">'+s.name+'</h1>'+
+    head.innerHTML='<div class="tag strand" style="background:'+col+';display:inline-block;margin-bottom:8px">'+glabel+'</div>'+
+      '<h1 style="color:'+col+'">'+s.name+'</h1>'+
       '<p>Select a topic to review its objectives, notes, worked examples and practice.</p>';
     var list=document.getElementById('tlist');
-    window.TOPIC_ORDER.filter(function(c){return C[c].strandId===id;}).forEach(function(c){
+    window.TOPIC_ORDER.filter(function(c){return C[c].strandId===id && forms.indexOf(C[c].form)>-1;}).forEach(function(c){
       var t=C[c], st=(prog[c]||{}).status||'none', built=!!t.content;
       var li=el('li','trow'+(built?'':' locked'));
       li.innerHTML='<span class="code">'+t.code+'</span>'+
@@ -87,8 +98,9 @@
     var C=window.CURRICULUM, code=qp('id'), t=C[code];
     if(!t){ document.getElementById('topic').innerHTML='<p>Topic not found.</p>'; return; }
     var col=strandColor(t.strandId);
+    var gkey=groupOf(t.form), glabel=gkey==='3'?'Form 3':'Forms 1–2';
     document.getElementById('crumbs').innerHTML=
-      '<a href="index.html">Home</a> › <a href="strand.html?s='+t.strandId+'">'+t.strandShort+'</a> › '+t.code;
+      '<a href="index.html">Home</a> › '+glabel+' › <a href="strand.html?s='+t.strandId+'&g='+gkey+'">'+t.strandShort+'</a> › '+t.code;
     var root=document.getElementById('topic');
 
     // header

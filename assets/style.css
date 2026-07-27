@@ -46,6 +46,14 @@ header.site nav a{color:#fff;opacity:.9;margin-left:18px;font-size:.92rem}
 .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
 .dot.m{background:var(--ok)}.dot.p{background:var(--warn)}.dot.n{background:var(--none)}
 
+/* Form groups */
+.group{margin:26px 0 10px;padding:4px 0}
+.group.form3{border-top:2px dashed var(--line);margin-top:36px;padding-top:20px}
+.grouphead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 4px}
+.grouphead h2{margin:0;font-size:1.3rem;color:var(--brand)}
+.group.form3 .grouphead h2{color:var(--s5)}
+.groupnote{color:var(--muted);font-size:.86rem}
+
 /* Strand grid */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin:20px 0 40px}
 .scard{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--sc,var(--brand));

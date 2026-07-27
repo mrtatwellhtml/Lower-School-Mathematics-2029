@@ -5,6 +5,12 @@ Forms 1–3 mathematics topic, organised by strand, with private on-device progr
 tracking. Graded/teacher-visible tracking is handled in **Google Classroom** via linked
 Google Form quizzes.
 
+The home page is split into two separate sections — **Forms 1 & 2 · Review** (incoming
+knowledge) and **Form 3 · Current Year** — each with its own progress ring. Strand and
+topic pages carry a `g` parameter (`g=12` or `g=3`) so the two never mix. To move a
+topic between groups you'd only change its `form` in `data.js`; the grouping follows from
+that (form 3 → Form 3 section, forms 1–2 → Review section).
+
 ## What's here
 
 ```
