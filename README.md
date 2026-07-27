@@ -19,17 +19,21 @@ math-review-site/
 ├── strand.html        Topic list for one strand (?s=1..6)
 ├── topic.html         A single topic (?id=1.1.1)
 ├── assets/
-│   ├── style.css      All styling
-│   ├── app.js         Rendering + localStorage progress logic
-│   ├── data.js        All 70 topics: objectives + prerequisites (auto-generated)
-│   └── content.js     Full notes/examples/practice — Number strand (Forms 1–3)
+│   ├── style.css           All styling
+│   ├── app.js              Rendering + localStorage progress logic
+│   ├── data.js             All 70 topics: objectives + prerequisites (auto-generated)
+│   ├── qgen.js             Helpers for the randomly generated practice questions
+│   ├── content.js          Full notes/examples/practice — Number strand (Forms 1–3)
+│   └── content-algebra.js  Full notes/examples/practice — Algebra strand (Forms 1–3)
+├── tools/verify.js         Headless test suite (node tools/verify.js)
 └── README.md
 ```
 
-`data.js` gives every topic a page (objectives + prerequisites). `content.js` adds the
-rich content. Right now the **Number Operations & Number Theory** strand is fully built
-(10 topics); the other five strands show their objectives and a "coming soon" note until
-their content is authored the same way.
+`data.js` gives every topic a page (objectives + prerequisites). The `content*.js` files —
+one per strand — add the rich content. Two strands are fully built so far: **Number
+Operations & Number Theory** (10 topics) and **Algebra** (14 topics). The other four
+strands show their objectives and a "coming soon" note until their content is authored the
+same way.
 
 ## Run it locally
 
@@ -73,18 +77,43 @@ the website itself stores nothing about individual students.
 
 ## Add content to another strand
 
-Open `assets/content.js` and copy the pattern of a built topic:
+Create `assets/content-<strand>.js` (copy the wrapper from `content-algebra.js`), add a
+`<script>` tag for it in `index.html`, `strand.html` and `topic.html` after `data.js`, then
+copy the pattern of a built topic:
 
 ```js
 set('CODE', {
   notes:    [ {h:'Heading', html:'<p>…</p>'} ],
   examples: [ {q:'…', answer:'…', steps:['…','…']} ],
-  practice: [ {type:'text'|'mc', q:'…', answer:'…' /*or [..]*/, options:[…], answer:index, hint:'…'} ]
+  practice: [
+    {gen:function(){                       // generated: fresh numbers every time
+       var a=Q.int(2,8), x=Q.int(2,12);
+       return {type:'text', q:'Solve '+a+'x = '+(a*x)+'.', answer:Q.root(x), hint:'…'};
+    }},
+    {gen:function(){
+       var o=Q.mc('correct',['wrong1','wrong2','wrong3']);
+       return {type:'mc', q:'…', options:o.options, answer:o.answer, hint:'…'};
+    }},
+  ]
 });
 ```
 
 Objectives and prerequisites are already supplied for all 70 topics from `data.js`, so you
 only ever write notes, examples and practice.
+
+## Practice questions regenerate
+
+Notes and worked examples are fixed, but every practice question is **generated from a
+formula with random numbers**. A student presses **↻ New questions** and gets a fresh set
+of the same kind of problem — so practice never becomes "remember that the answer is 12",
+and they can keep drilling a topic until it sticks before taking the Classroom quiz.
+
+Answer checking is forgiving: `x^2`, `x²` and `x2` all match, as do `0.2`, `.2` and `0.20`,
+and `5` or `x=5` for an equation.
+
+To add a topic, write each practice item as a `gen` function that picks its numbers first
+and builds the question from them — see the *Generated practice* section of `CLAUDE.md`.
+Run `node tools/verify.js` afterwards; it fuzzes every generator 400 times.
 
 ## Progress model
 

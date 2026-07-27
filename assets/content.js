@@ -3,6 +3,7 @@
    + prerequisites from data.js and show "content coming soon". */
 (function(){
   var C=window.CURRICULUM; if(!C) return;
+  var Q=window.QG;   // question generators — see qgen.js
   function f(a,b){ return '<span class="frac"><span>'+a+'</span><span>'+b+'</span></span>'; } // fraction
   function set(code,content){ if(C[code]) C[code].content=content; }
 
@@ -38,11 +39,41 @@
               '5 means round up: 7 → 8.','Everything after becomes 0 → 48 000.']},
     ],
     practice:[
-      {type:'text', q:'What is the place value of the 6 in 3 6<b> </b>? (the underlined digit in 3<u>6</u>84)', answer:['600','6 hundreds','hundreds'], hint:'Count the columns from the right: units, tens, hundreds…'},
-      {type:'text', q:'Round 8 465 to the nearest hundred.', answer:['8500','8 500'], hint:'Look at the tens digit (6). 5 or more rounds up.'},
-      {type:'mc', q:'Which of these is a prime number?', options:['21','27','29','33'], answer:2, hint:'A prime has exactly two factors: 1 and itself.'},
-      {type:'text', q:'Find the HCF of 18 and 30.', answer:['6'], hint:'18 = 2×3², 30 = 2×3×5. Take common primes to the lowest power.'},
-      {type:'text', q:'Find the LCM of 6 and 8.', answer:['24'], hint:'List multiples of each until they meet: 6,12,18,24… and 8,16,24…'},
+      {gen:function(){
+        var d=[Q.int(1,9),Q.int(0,9),Q.int(0,9),Q.int(0,9)], p=Q.int(0,3);
+        d[p]=Q.int(1,9);                                   // never underline a zero
+        var pv=d[p]*Math.pow(10,3-p);
+        var shown=d.map(function(x,i){ return i===p?'<u>'+x+'</u>':String(x); }).join('');
+        return {type:'text', q:'What is the place value of the underlined digit in '+shown+'?',
+          answer:[String(pv)], hint:'Columns from the right: units, tens, hundreds, thousands.'};
+      }},
+      {gen:function(){
+        var place=Q.pick([[10,'ten'],[100,'hundred'],[1000,'thousand']]);
+        var n=Q.int(place[0]*2, 9999);
+        if(n%place[0]===place[0]/2) n+=1;                  // avoid an exact-half tie
+        return {type:'text', q:'Round '+n+' to the nearest '+place[1]+'.',
+          answer:[String(Math.round(n/place[0])*place[0])],
+          hint:'Look at the digit one place to the right. 5 or more rounds up.'};
+      }},
+      {gen:function(){
+        var primes=[11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97];
+        var comps=[21,25,27,33,35,39,49,51,55,57,63,65,69,77,81,85,87,91,93,95];
+        var o=Q.mc(Q.pick(primes), Q.sample(comps,3));
+        return {type:'mc', q:'Which of these is a prime number?', options:o.options, answer:o.answer,
+          hint:'A prime has exactly two factors: 1 and itself.'};
+      }},
+      {gen:function(){
+        var g=Q.int(2,12), p=Q.coprime(), a=g*p[0], b=g*p[1];
+        return {type:'text', q:'Find the HCF of '+a+' and '+b+'.', answer:[String(g)],
+          hint:'Write each as a product of primes, then take the common primes to the lowest power.'};
+      }},
+      {gen:function(){
+        var a=Q.int(3,15), b=Q.int(3,15);
+        if(a===b) b=a+Q.int(1,4);
+        return {type:'text', q:'Find the LCM of '+a+' and '+b+'.', answer:[String(Q.lcm(a,b))],
+          hint:'List the multiples of each until they meet: '+[1,2,3,4].map(function(k){return a*k;}).join(',')+
+               '… and '+[1,2,3,4].map(function(k){return b*k;}).join(',')+'…'};
+      }},
     ]
   });
 
@@ -68,11 +99,42 @@
        steps:['Multiply the whole number by the denominator: 2 × 5 = 10.','Add the numerator: 10 + 3 = 13.','Keep the denominator: '+f('13','5')+'.']},
     ],
     practice:[
-      {type:'text', q:'Simplify '+f('15','20')+'. (write as a/b, e.g. 3/4)', answer:['3/4'], hint:'HCF of 15 and 20 is 5.'},
-      {type:'mc', q:'Which fraction is equivalent to '+f('2','3')+'?', options:[f('4','9'),f('6','9'),f('3','4'),f('5','6')], answer:1, hint:'Multiply top and bottom of 2/3 by 3.'},
-      {type:'text', q:'Convert 3'+f('1','4')+' to an improper fraction (a/b).', answer:['13/4'], hint:'3×4 + 1, over 4.'},
-      {type:'mc', q:'Which is the largest?', options:[f('2','3'),f('3','5'),f('5','8')], answer:0, hint:'Use a common denominator of 120, or convert to decimals.'},
-      {type:'text', q:'Write '+f('7','4')+' as a mixed number (e.g. 1 3/4, use 1 3/4 format).', answer:['1 3/4','13/4'], hint:'How many whole 4s fit in 7? The remainder is the new top.'},
+      {gen:function(){
+        var p=Q.coprime(), k=Q.int(2,9), a=k*p[0], b=k*p[1];
+        return {type:'text', q:'Simplify '+f(a,b)+'. (write as a/b, e.g. 3/4)',
+          answer:[p[0]+'/'+p[1]], hint:'The HCF of '+a+' and '+b+' is '+k+'.'};
+      }},
+      {gen:function(){
+        var p=Q.coprime(), k=Q.int(2,5);
+        var right=f(k*p[0], k*p[1]);
+        var o=Q.mc(right, [f(p[0]+1, k*p[1]), f(k*p[0], p[1]+k), f(p[0]+k, p[1]+k)]);
+        return {type:'mc', q:'Which fraction is equivalent to '+f(p[0],p[1])+'?',
+          options:o.options, answer:o.answer,
+          hint:'Multiply the top and the bottom of '+p[0]+'/'+p[1]+' by '+k+'.'};
+      }},
+      {gen:function(){
+        var w=Q.int(2,6), b=Q.int(3,9), a=Q.int(1,b-1);
+        return {type:'text', q:'Convert '+w+f(a,b)+' to an improper fraction (a/b).',
+          answer:[(w*b+a)+'/'+b], hint:w+'×'+b+' + '+a+', over '+b+'.'};
+      }},
+      {gen:function(){
+        var fr=[], seen={};
+        while(fr.length<3){
+          var p=Q.coprime(), v=p[0]/p[1];
+          if(p[0]>=p[1]||seen[v]) continue;              // proper fractions, all different
+          seen[v]=1; fr.push(p);
+        }
+        var best=fr.reduce(function(x,y){ return x[0]/x[1]>=y[0]/y[1]?x:y; });
+        var o=Q.mc(f(best[0],best[1]), fr.filter(function(p){return p!==best;}).map(function(p){return f(p[0],p[1]);}));
+        return {type:'mc', q:'Which is the largest?', options:o.options, answer:o.answer,
+          hint:'Use a common denominator, or convert each to a decimal.'};
+      }},
+      {gen:function(){
+        var b=Q.int(3,9), w=Q.int(1,5), a=Q.int(1,b-1), top=w*b+a;
+        return {type:'text', q:'Write '+f(top,b)+' as a mixed number (use the format 1 3/4).',
+          answer:[w+' '+a+'/'+b],
+          hint:'How many whole '+b+'s fit into '+top+'? The remainder becomes the new top.'};
+      }},
     ]
   });
 
@@ -97,11 +159,32 @@
        steps:['Two negative signs multiplied give a positive.','6 × 4 = 24, so the answer is +24.']},
     ],
     practice:[
-      {type:'text', q:'Calculate −8 + 5.', answer:['-3','−3'], hint:'Move 5 to the right from −8.'},
-      {type:'text', q:'Calculate 6 − (−2).', answer:['8'], hint:'Subtracting a negative is the same as adding.'},
-      {type:'text', q:'Calculate (−5) × 3.', answer:['-15','−15'], hint:'Different signs give a negative product.'},
-      {type:'mc', q:'The temperature is −3°C and falls by 4°C. What is the new temperature?', options:['−1°C','1°C','−7°C','7°C'], answer:2, hint:'Falling means subtract: −3 − 4.'},
-      {type:'text', q:'Calculate (−12) ÷ (−4).', answer:['3'], hint:'Same signs give a positive result.'},
+      {gen:function(){
+        var a=-Q.int(2,15), b=Q.int(2,15);
+        return {type:'text', q:'Calculate '+Q.num(a)+' + '+b+'.', answer:[String(a+b)],
+          hint:'Move '+b+' to the right from '+Q.num(a)+'.'};
+      }},
+      {gen:function(){
+        var a=Q.int(2,15), b=Q.int(2,12);
+        return {type:'text', q:'Calculate '+a+' − ('+Q.num(-b)+').', answer:[String(a+b)],
+          hint:'Subtracting a negative is the same as adding.'};
+      }},
+      {gen:function(){
+        var a=-Q.int(2,12), b=Q.int(2,9);
+        return {type:'text', q:'Calculate ('+Q.num(a)+') × '+b+'.', answer:[String(a*b)],
+          hint:'Different signs give a negative product.'};
+      }},
+      {gen:function(){
+        var start=-Q.int(1,10), drop=Q.int(2,12), ans=start-drop;
+        var o=Q.mc(Q.num(ans)+'°C', [Q.num(start+drop)+'°C', String(Math.abs(ans))+'°C', Q.num(-drop)+'°C']);
+        return {type:'mc', q:'The temperature is '+Q.num(start)+'°C and falls by '+drop+'°C. What is the new temperature?',
+          options:o.options, answer:o.answer, hint:'Falling means subtract: '+Q.num(start)+' − '+drop+'.'};
+      }},
+      {gen:function(){
+        var b=Q.int(2,9), q=Q.int(2,9);
+        return {type:'text', q:'Calculate ('+Q.num(-b*q)+') ÷ ('+Q.num(-b)+').', answer:[String(q)],
+          hint:'Same signs give a positive result.'};
+      }},
     ]
   });
 
@@ -125,11 +208,42 @@
        steps:['0.375 = '+f('375','1000')+'.','Divide top and bottom by their HCF, 125.','375÷125 = 3, 1000÷125 = 8 → '+f('3','8')+'.']},
     ],
     practice:[
-      {type:'text', q:'Calculate 2.6 + 0.85.', answer:['3.45'], hint:'Line up the points: 2.60 + 0.85.'},
-      {type:'text', q:'Calculate 0.6 × 0.3.', answer:['0.18','.18'], hint:'6×3 = 18, then two decimal places.'},
-      {type:'text', q:'Write 0.25 as a fraction in lowest terms (a/b).', answer:['1/4'], hint:'25/100 simplifies by dividing by 25.'},
-      {type:'mc', q:'Which is largest?', options:['0.7','0.68','0.702','0.09'], answer:2, hint:'Compare digit by digit after the point: 0.700, 0.680, 0.702…'},
-      {type:'text', q:'Convert '+f('3','4')+' to a decimal.', answer:['0.75','.75'], hint:'Divide 3 by 4.'},
+      {gen:function(){
+        // work in hundredths so the arithmetic is exact
+        var a=Q.int(110,890), b=Q.int(5,99);
+        var A=(a/100).toFixed(a%10?2:1), B=(b/100).toFixed(2);
+        return {type:'text', q:'Calculate '+A+' + '+B+'.',
+          answer:Q.dec((a+b)/100), hint:'Line up the decimal points before you add.'};
+      }},
+      {gen:function(){
+        var a=Q.int(2,9), b=Q.int(2,9), p=a*b;
+        return {type:'text', q:'Calculate 0.'+a+' × 0.'+b+'.',
+          answer:Q.dec(p/100), hint:a+'×'+b+' = '+p+', then two decimal places.'};
+      }},
+      {gen:function(){
+        var b=Q.pick([2,4,5,8,10,20,25,50]), a=Q.int(1,b-1), s=Q.simp(a,b);
+        return {type:'text', q:'Write '+(a/b)+' as a fraction in lowest terms (a/b).',
+          answer:[s[0]+'/'+s[1]],
+          hint:'Write it over '+(b<=10?'10':b<=100?'100':'1000')+', then divide top and bottom by their HCF.'};
+      }},
+      {gen:function(){
+        var vals=[], seen={};
+        while(vals.length<4){
+          var v=(Q.int(1,999)/1000);
+          var s=v.toFixed(Q.int(1,3)).replace(/0+$/,'').replace(/\.$/,'.0');
+          if(seen[parseFloat(s)]||parseFloat(s)===0) continue;
+          seen[parseFloat(s)]=1; vals.push(s);
+        }
+        var best=vals.reduce(function(x,y){ return parseFloat(x)>=parseFloat(y)?x:y; });
+        var o=Q.mc(best, vals.filter(function(v){return v!==best;}));
+        return {type:'mc', q:'Which is largest?', options:o.options, answer:o.answer,
+          hint:'Give them all the same number of decimal places, then compare digit by digit.'};
+      }},
+      {gen:function(){
+        var b=Q.pick([2,4,5,8,10,20,25]), a=Q.int(1,b-1), d=a/b;
+        return {type:'text', q:'Convert '+f(a,b)+' to a decimal.',
+          answer:Q.dec(d), hint:'Divide '+a+' by '+b+'.'};
+      }},
     ]
   });
 
@@ -152,11 +266,34 @@
        steps:['Make the denominator 100: '+f('7','20')+' × '+f('5','5')+' = '+f('35','100')+'.',f('35','100')+' = 35%.']},
     ],
     practice:[
-      {type:'text', q:'Write 0.6 as a percentage (e.g. 55%).', answer:['60%','60'], hint:'Multiply by 100.'},
-      {type:'text', q:'Find 25% of 80.', answer:['20'], hint:'25% is a quarter.'},
-      {type:'text', q:'Write '+f('3','4')+' as a percentage.', answer:['75%','75'], hint:'3/4 = 75/100.'},
-      {type:'mc', q:'40% of a class of 30 wear glasses. How many is that?', options:['10','12','15','8'], answer:1, hint:'0.4 × 30.'},
-      {type:'text', q:'Convert 8% to a decimal.', answer:['0.08','.08'], hint:'Divide by 100.'},
+      {gen:function(){
+        var p=Q.int(1,99), d=p/100;
+        return {type:'text', q:'Write '+d+' as a percentage (e.g. 55%).',
+          answer:[p+'%', String(p)], hint:'Multiply by 100.'};
+      }},
+      {gen:function(){
+        var p=Q.pick([5,10,20,25,40,50,60,75,80]), n=Q.pick([20,40,60,80,120,140,160,200,240,300]);
+        return {type:'text', q:'Find '+p+'% of '+n+'.', answer:[String(p*n/100)],
+          hint:p+'% = '+(p/100)+', so multiply '+n+' by '+(p/100)+'.'};
+      }},
+      {gen:function(){
+        var b=Q.pick([4,5,10,20,25,50]), a=Q.int(1,b-1), pc=a*100/b;
+        return {type:'text', q:'Write '+f(a,b)+' as a percentage.',
+          answer:[pc+'%', String(pc)], hint:a+'/'+b+' = '+pc+'/100.'};
+      }},
+      {gen:function(){
+        var p=Q.pick([10,20,25,40,50,60,75]), n=Q.pick([20,24,28,30,32,36,40]);
+        var ans=p*n/100;
+        if(ans!==Math.round(ans)){ n=40; ans=p*n/100; }
+        var o=Q.mc(String(ans), [String(ans+2), String(Math.round(n/2)), String(p/10)]);
+        return {type:'mc', q:p+'% of a class of '+n+' wear glasses. How many is that?',
+          options:o.options, answer:o.answer, hint:(p/100)+' × '+n+'.'};
+      }},
+      {gen:function(){
+        var p=Q.int(1,99), d=p/100;
+        return {type:'text', q:'Convert '+p+'% to a decimal.',
+          answer:Q.dec(d), hint:'Divide by 100.'};
+      }},
     ]
   });
 
@@ -179,11 +316,36 @@
        steps:['Discount = 15% of 80 = 0.15 × 80 = $12.','Sale price = 80 − 12 = $68. (Or 85% × 80 = $68.)']},
     ],
     practice:[
-      {type:'text', q:'CP = $40, SP = $52. Find the profit ($).', answer:['12','$12'], hint:'Profit = SP − CP.'},
-      {type:'text', q:'A book bought for $50 is sold for $45. Find the percentage loss.', answer:['10%','10'], hint:'Loss = 5; divide by CP = 50, ×100.'},
-      {type:'text', q:'Find the price of a $120 item after a 25% discount ($).', answer:['90','$90'], hint:'Pay 75% of 120.'},
-      {type:'mc', q:'A $200 item has 12% VAT added. What is the total?', options:['$212','$224','$188','$240'], answer:1, hint:'112% of 200.'},
-      {type:'text', q:'CP = $250, profit is 20%. Find the selling price ($).', answer:['300','$300'], hint:'SP = 120% of CP.'},
+      {gen:function(){
+        var cp=Q.int(20,200), profit=Q.int(5,60);
+        return {type:'text', q:'CP = $'+cp+', SP = $'+(cp+profit)+'. Find the profit ($).',
+          answer:[String(profit), '$'+profit], hint:'Profit = SP − CP.'};
+      }},
+      {gen:function(){
+        var pc=Q.pick([5,10,15,20,25,40]), cp=Q.pick([40,50,60,80,100,120,200,250]);
+        var loss=cp*pc/100;
+        return {type:'text', q:'A book bought for $'+cp+' is sold for $'+(cp-loss)+'. Find the percentage loss.',
+          answer:[pc+'%', String(pc)], hint:'Loss = '+loss+'; divide by CP = '+cp+', then × 100.'};
+      }},
+      {gen:function(){
+        var pc=Q.pick([10,15,20,25,30,40,50]), mp=Q.pick([80,120,150,200,240,300,400]);
+        return {type:'text', q:'Find the price of a $'+mp+' item after a '+pc+'% discount ($).',
+          answer:[String(mp*(100-pc)/100), '$'+(mp*(100-pc)/100)],
+          hint:'Pay '+(100-pc)+'% of '+mp+'.'};
+      }},
+      {gen:function(){
+        var t=Q.pick([5,10,12,15,20]), p=Q.pick([150,200,250,300,400,500]);
+        var tot=p*(100+t)/100;
+        var o=Q.mc('$'+tot, ['$'+(p*(100-t)/100), '$'+(p+t), '$'+(p*2)]);
+        return {type:'mc', q:'A $'+p+' item has '+t+'% VAT added. What is the total?',
+          options:o.options, answer:o.answer, hint:(100+t)+'% of '+p+'.'};
+      }},
+      {gen:function(){
+        var pc=Q.pick([10,15,20,25,30,40,50]), cp=Q.pick([80,120,150,200,250,300,400]);
+        var sp=cp*(100+pc)/100;
+        return {type:'text', q:'CP = $'+cp+', profit is '+pc+'%. Find the selling price ($).',
+          answer:[String(sp), '$'+sp], hint:'SP = '+(100+pc)+'% of CP.'};
+      }},
     ]
   });
 
@@ -207,11 +369,35 @@
        steps:['Order of operations: multiply first. 3 × (−2) = −6.','Then −4 + (−6) = −10.']},
     ],
     practice:[
-      {type:'mc', q:'Which statement is true?', options:['−6 > −2','−6 < −2','−6 = −2','−6 > 0'], answer:1, hint:'Further left on the number line = smaller.'},
-      {type:'text', q:'Evaluate −5 − (−9).', answer:['4'], hint:'Subtracting a negative adds.'},
-      {type:'text', q:'Evaluate (−3) × (−6).', answer:['18'], hint:'Two negatives multiply to a positive.'},
-      {type:'text', q:'Evaluate 12 ÷ (−4) + 1.', answer:['-2','−2'], hint:'Divide first: 12 ÷ (−4) = −3, then + 1.'},
-      {type:'mc', q:'A diver at −18 m rises 7 m. What is the new depth?', options:['−25 m','−11 m','11 m','25 m'], answer:1, hint:'Rising adds: −18 + 7.'},
+      {gen:function(){
+        var big=-Q.int(5,20), small=-Q.int(1,4);   // big is further left, so smaller
+        var o=Q.mc(Q.num(big)+' &lt; '+Q.num(small),
+          [Q.num(big)+' &gt; '+Q.num(small), Q.num(big)+' = '+Q.num(small), Q.num(big)+' &gt; 0']);
+        return {type:'mc', q:'Which statement is true?', options:o.options, answer:o.answer,
+          hint:'Further left on the number line = smaller.'};
+      }},
+      {gen:function(){
+        var a=-Q.int(1,12), b=-Q.int(2,15);
+        return {type:'text', q:'Evaluate '+Q.num(a)+' − ('+Q.num(b)+').', answer:[String(a-b)],
+          hint:'Subtracting a negative adds.'};
+      }},
+      {gen:function(){
+        var a=-Q.int(2,9), b=-Q.int(2,9);
+        return {type:'text', q:'Evaluate ('+Q.num(a)+') × ('+Q.num(b)+').', answer:[String(a*b)],
+          hint:'Two negatives multiply to a positive.'};
+      }},
+      {gen:function(){
+        var b=Q.int(2,6), q=Q.int(2,9), c=Q.int(1,10);
+        return {type:'text', q:'Evaluate '+(b*q)+' ÷ ('+Q.num(-b)+') + '+c+'.',
+          answer:[String(-q+c)],
+          hint:'Divide first: '+(b*q)+' ÷ ('+Q.num(-b)+') = '+Q.num(-q)+', then + '+c+'.'};
+      }},
+      {gen:function(){
+        var depth=-Q.int(10,40), rise=Q.int(3,depth*-1-1), ans=depth+rise;
+        var o=Q.mc(Q.num(ans)+' m', [Q.num(depth-rise)+' m', Math.abs(ans)+' m', Math.abs(depth-rise)+' m']);
+        return {type:'mc', q:'A diver at '+Q.num(depth)+' m rises '+rise+' m. What is the new depth?',
+          options:o.options, answer:o.answer, hint:'Rising adds: '+Q.num(depth)+' + '+rise+'.'};
+      }},
     ]
   });
 
@@ -237,11 +423,40 @@
        steps:['Place the point after the first non-zero digit: 6.8.','Count how many places it moved: 4 places left.','So 68 000 = 6.8 × 10⁴.']},
     ],
     practice:[
-      {type:'mc', q:'Which law does a(b + c) = ab + ac show?', options:['Commutative','Associative','Distributive','Closure'], answer:2, hint:'It “distributes” the multiply over the add.'},
-      {type:'text', q:'Write 320 000 in standard form (use 3.2 x 10^5 style: 3.2e5).', answer:['3.2e5','3.2 x 10^5','3.2×10^5'], hint:'Move the point 5 places.'},
-      {type:'text', q:'Write 5.6 × 10³ as an ordinary number.', answer:['5600','5 600'], hint:'Move the point 3 places right.'},
-      {type:'mc', q:'Which is the additive inverse of 8?', options:['0','1',f('1','8'),'−8'], answer:3, hint:'It adds to 8 to give 0.'},
-      {type:'text', q:'Write 0.00045 in standard form (e.g. 4.5e-4).', answer:['4.5e-4','4.5 x 10^-4','4.5×10^-4'], hint:'The point moves 4 places right, so the power is −4.'},
+      {gen:function(){
+        var laws=[
+          ['a(b + c) = ab + ac','Distributive','It “distributes” the multiply over the add.'],
+          ['a + b = b + a','Commutative','The order was swapped.'],
+          ['a × b = b × a','Commutative','The order was swapped.'],
+          ['(a + b) + c = a + (b + c)','Associative','Only the grouping changed.'],
+          ['(a × b) × c = a × (b × c)','Associative','Only the grouping changed.']
+        ];
+        var L=Q.pick(laws);
+        var o=Q.mc(L[1], ['Commutative','Associative','Distributive','Closure'].filter(function(x){return x!==L[1];}).slice(0,3));
+        return {type:'mc', q:'Which law does '+L[0]+' show?', options:o.options, answer:o.answer, hint:L[2]};
+      }},
+      {gen:function(){
+        var A=(Q.int(11,99)/10), n=Q.int(3,7), val=A*Math.pow(10,n);
+        return {type:'text', q:'Write '+val.toLocaleString('en-US').replace(/,/g,' ')+
+            ' in standard form (use the style 3.2e5).',
+          answer:Q.stdform(A,n), hint:'Move the point '+n+' places.'};
+      }},
+      {gen:function(){
+        var A=(Q.int(11,99)/10), n=Q.int(2,5), val=A*Math.pow(10,n);
+        return {type:'text', q:'Write '+A+' × 10'+Q.sup(n)+' as an ordinary number.',
+          answer:[String(val)], hint:'Move the point '+n+' places right.'};
+      }},
+      {gen:function(){
+        var a=Q.int(2,15);
+        var o=Q.mc('−'+a, ['0','1',f('1',a)]);
+        return {type:'mc', q:'Which is the additive inverse of '+a+'?', options:o.options, answer:o.answer,
+          hint:'It adds to '+a+' to give 0.'};
+      }},
+      {gen:function(){
+        var A=(Q.int(11,99)/10), n=Q.int(3,6), val=A*Math.pow(10,-n);
+        return {type:'text', q:'Write '+val.toFixed(n+1)+' in standard form (e.g. 4.5e-4).',
+          answer:Q.stdform(A,-n), hint:'The point moves '+n+' places right, so the power is −'+n+'.'};
+      }},
     ]
   });
 
@@ -264,11 +479,34 @@
        steps:['25÷2 = 12 r1; 12÷2 = 6 r0; 6÷2 = 3 r0; 3÷2 = 1 r1; 1÷2 = 0 r1.','Read remainders bottom-to-top: 11001.','Check: 16+8+0+0+1 = 25 ✓']},
     ],
     practice:[
-      {type:'text', q:'Convert 1011₂ to base 10.', answer:['11'], hint:'8 + 0 + 2 + 1.'},
-      {type:'text', q:'Convert 1000₂ to base 10.', answer:['8'], hint:'Only the 8s column is on.'},
-      {type:'text', q:'Convert 6 to base 2.', answer:['110','110_2','110₂'], hint:'4 + 2, so the 4 and 2 columns are on.'},
-      {type:'mc', q:'Which base-10 number equals 1111₂?', options:['11','15','8','16'], answer:1, hint:'8 + 4 + 2 + 1.'},
-      {type:'text', q:'Convert 12 to base 2.', answer:['1100','1100_2','1100₂'], hint:'8 + 4.'},
+      {gen:function(){
+        var n=Q.int(5,31), b=Q.toBase(n,2);
+        var cols=b.split('').map(function(d,i){ return d+'×'+Math.pow(2,b.length-1-i); }).join(' + ');
+        return {type:'text', q:'Convert '+b+'₂ to base 10.', answer:[String(n)], hint:cols+'.'};
+      }},
+      {gen:function(){
+        var p=Q.int(2,7), n=Math.pow(2,p), extra=Q.chance(0.5)?1:0;
+        return {type:'text', q:'Convert '+Q.toBase(n+extra,2)+'₂ to base 10.', answer:[String(n+extra)],
+          hint:extra?'The '+n+'s column and the units column are on.':'Only the '+n+'s column is on.'};
+      }},
+      {gen:function(){
+        var n=Q.int(3,20), b=Q.toBase(n,2);
+        var on=b.split('').map(function(d,i){ return d==='1'?Math.pow(2,b.length-1-i):0; })
+                .filter(function(v){return v;});
+        return {type:'text', q:'Convert '+n+' to base 2.', answer:[b, b+'_2', b+'₂'],
+          hint:on.join(' + ')+', so those columns are on.'};
+      }},
+      {gen:function(){
+        var n=Q.int(5,31), b=Q.toBase(n,2);
+        var o=Q.mc(String(n), [String(n+1), String(n-2), String(b.length*4)]);
+        return {type:'mc', q:'Which base-10 number equals '+b+'₂?', options:o.options, answer:o.answer,
+          hint:'Add the column values wherever there is a 1.'};
+      }},
+      {gen:function(){
+        var n=Q.int(8,40), b=Q.toBase(n,2);
+        return {type:'text', q:'Convert '+n+' to base 2.', answer:[b, b+'_2', b+'₂'],
+          hint:'Divide by 2 repeatedly and read the remainders bottom to top.'};
+      }},
     ]
   });
 
@@ -295,11 +533,51 @@
        steps:['Right column: 0 + 1 = 1.','Middle: 1 + 0 = 1.','Left: 1 + 1 = 10 → write 0, carry 1.','Carried 1 to the front: 1011₂. (Check: 6 + 5 = 11 = 8+2+1 ✓)']},
     ],
     practice:[
-      {type:'mc', q:'Which of these is irrational?', options:[f('2','7'),'√16','√7','0.5'], answer:2, hint:'A perfect-square root is rational; √7 is not.'},
-      {type:'mc', q:'√2 lies between which two integers?', options:['0 and 1','1 and 2','2 and 3','3 and 4'], answer:1, hint:'1²=1, 2²=4, and 2 is between them.'},
-      {type:'text', q:'Is 0.666… (recurring) rational or irrational?', answer:['rational'], hint:'It equals 2/3 — a fraction.'},
-      {type:'text', q:'Add in base 2: 10₂ + 11₂. (give the base-2 answer, e.g. 101)', answer:['101','101_2','101₂'], hint:'2 + 3 = 5 = 4+1 → 101₂.'},
-      {type:'text', q:'Approximate √10 to 1 decimal place.', answer:['3.2'], hint:'3.1² = 9.61, 3.2² = 10.24 — which is closer to 10?'},
+      {gen:function(){
+        var nonSq=[2,3,5,6,7,8,10,11,12,13,15,17,18,19,20].filter(function(n){
+          return Math.sqrt(n)!==Math.round(Math.sqrt(n)); });
+        var irr='√'+Q.pick(nonSq), sq=Q.pick([4,9,16,25,36,49]), p=Q.coprime();
+        var o=Q.mc(irr, [f(p[0],p[1]), '√'+sq, String(Q.int(1,9)/10)]);
+        return {type:'mc', q:'Which of these is irrational?', options:o.options, answer:o.answer,
+          hint:'A perfect-square root is rational; the root of a non-square is not.'};
+      }},
+      {gen:function(){
+        var lo=Q.int(1,9), n=Q.int(lo*lo+1, (lo+1)*(lo+1)-1);
+        var o=Q.mc(lo+' and '+(lo+1),
+          [(lo+1)+' and '+(lo+2), Math.max(0,lo-1)+' and '+lo, (lo+2)+' and '+(lo+3)]);
+        return {type:'mc', q:'√'+n+' lies between which two integers?', options:o.options, answer:o.answer,
+          hint:lo+'²='+(lo*lo)+', '+(lo+1)+'²='+((lo+1)*(lo+1))+', and '+n+' is between them.'};
+      }},
+      {gen:function(){
+        var rational=Q.chance(0.5), item, why;
+        if(rational){
+          var p=Q.pick([['0.'+String(Q.int(1,8)).repeat(3)+'… (recurring)','it is a recurring decimal, so it equals a fraction'],
+                        [String(Q.int(1,20)/8),'it is a terminating decimal'],
+                        ['√'+Q.pick([4,9,16,25,36,49,64]),'the root of a perfect square is a whole number']]);
+          item=p[0]; why=p[1];
+        } else {
+          var ns=[2,3,5,6,7,8,10,11,12,13,14,15,17,18,19,20];
+          item=Q.chance(0.25)?'π':'√'+Q.pick(ns);
+          why='its decimal never ends and never repeats';
+        }
+        return {type:'text', q:'Is '+item+' rational or irrational? (write rational or irrational)',
+          answer:[rational?'rational':'irrational'], hint:'Ask yourself whether '+why+'.'};
+      }},
+      {gen:function(){
+        var a=Q.int(2,15), b=Q.int(2,15), s=a+b;
+        return {type:'text', q:'Add in base 2: '+Q.toBase(a,2)+'₂ + '+Q.toBase(b,2)+
+            '₂. (give the base-2 answer, e.g. 101)',
+          answer:[Q.toBase(s,2), Q.toBase(s,2)+'_2', Q.toBase(s,2)+'₂'],
+          hint:a+' + '+b+' = '+s+', and '+s+' in base 2 has '+Q.toBase(s,2).length+' digits.'};
+      }},
+      {gen:function(){
+        var n=Q.int(2,99);
+        if(Math.sqrt(n)===Math.round(Math.sqrt(n))) n+=1;
+        var r=Math.round(Math.sqrt(n)*10)/10, lo=(Math.floor(Math.sqrt(n)*10)/10);
+        return {type:'text', q:'Approximate √'+n+' to 1 decimal place.', answer:[r.toFixed(1)],
+          hint:lo.toFixed(1)+'² = '+(lo*lo).toFixed(2)+' and '+(lo+0.1).toFixed(1)+'² = '+
+               ((lo+0.1)*(lo+0.1)).toFixed(2)+' — which is closer to '+n+'?'};
+      }},
     ]
   });
 

@@ -134,6 +134,8 @@ sup{font-size:.72em}
 .btn.ghost{background:#fff;color:var(--accent);border:1.5px solid var(--accent)}
 .btn.big{padding:12px 22px;font-size:1rem}
 .btn:disabled{opacity:.5;cursor:not-allowed}
+.pactions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.pactions #newBtn{margin-left:auto}
 .scorebox{margin:14px 0;padding:14px 16px;border-radius:12px;background:var(--nonebg);font-weight:600;display:none}
 .scorebox.show{display:block}
 
