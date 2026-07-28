@@ -39,8 +39,9 @@ assets/
   data.js       AUTO-GENERATED. All 70 topics: code, form, strand, name, objectives[],
                 prereq[], quizItems, classroomUrl. Do not hand-edit objectives.
   qgen.js       window.QG — random-number/formatting helpers for generated practice.
-  content.js         Hand-authored content — Number strand, attached via set('code',{...}).
-  content-algebra.js Same pattern — Algebra strand.
+  content.js             Hand-authored content — Number strand, attached via set('code',{...}).
+  content-algebra.js     Same pattern — Algebra strand.
+  content-measurement.js Same pattern — Measurement strand.
 tools/
   verify.js     Headless test suite. `node tools/verify.js` — run it after any change.
 ```
@@ -138,17 +139,19 @@ Mastery threshold = **80%** (`MASTERY` const). Scoring 80%+ on on-site practice 
 ## Status — done vs. next
 
 **Done:** site skeleton; two-group split; self-tracking + dashboards; all 70 topics have
-objectives + prerequisites. Two strands fully built (24 topics):
+objectives + prerequisites. Three strands fully built (40 of 70 topics):
 - **Number Operations & Number Theory** (10) — F1: 1.1.1–1.1.6, F2: 2.1.1–2.1.3, F3: 3.1.1.
 - **Algebra** (14) — F1: 1.6.1, 1.6.2, 1.6.6; F2: 2.6.1–2.6.4; F3: 3.6.1–3.6.7.
+- **Measurement** (16) — F1: 1.5.1–1.5.6, F2: 2.5.1–2.5.6, F3: 3.5.1–3.5.4.
 
-The other four strands (Sets & Functions, Statistics, Geometry, Measurement) render
-objectives + prerequisites with a "content coming soon" note.
+The other three strands (Sets & Functions, Statistics, Geometry) render objectives +
+prerequisites with a "content coming soon" note.
 
 **Next (suggested order):**
-1. Author content for another strand — **Measurement (5)** or **Geometry (4)** are the
-   high-value ones next. Use the per-strand file convention above; pull objectives/prereqs
-   context from the framework docx.
+1. Author content for another strand — **Geometry (4, 15 topics)** is the biggest
+   remaining, then Statistics (3) and Sets & Functions (2). Use the per-strand file
+   convention above; pull objectives/prereqs context from the framework docx. Note that
+   Geometry leans on diagrams, so consider inline SVG in the notes.
 2. Create the Google Form Mastery Quizzes and paste each share link into the matching
    topic's `classroomUrl` in `data.js`.
 3. Build the diagnostic pre-test (Google Form) and link it on the home page.

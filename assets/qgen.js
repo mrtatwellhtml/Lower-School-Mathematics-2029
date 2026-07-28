@@ -75,6 +75,14 @@
   }
 
   // ---- answer-list builders ----
+  // round to dp decimal places, killing floating-point dust (3.14*49 -> 153.86, not 153.86000000000001)
+  function fix(v,dp){ var m=Math.pow(10,dp==null?2:dp); return Math.round(v*m)/m; }
+  // a money answer, accepting 12.50 / $12.50 / 12.5 / $12.5
+  function money(v){
+    var out={}, two=v.toFixed(2), plain=String(fix(v,2));
+    [two, plain].forEach(function(s){ out[s]=1; out['$'+s]=1; });
+    return Object.keys(out);
+  }
   /* Every sensible way of typing a decimal: 0.2 / .2 / 0.20 / .20 …
      Without this, a student who writes 0.2 for an answer stored as '0.20' is marked wrong. */
   function dec(v){
@@ -101,5 +109,6 @@
               gcd:gcd, lcm:lcm, simp:simp, coprime:coprime,
               frac:frac, num:num, sup:sup, pow:pow, sub:sub,
               poly:poly, polyHtml:polyHtml, polyAns:polyAns, mc:mc,
-              dec:dec, ineq:ineq, stdform:stdform, root:root, toBase:toBase, fromBase:fromBase };
+              dec:dec, fix:fix, money:money, ineq:ineq, stdform:stdform, root:root,
+              toBase:toBase, fromBase:fromBase };
 })();
