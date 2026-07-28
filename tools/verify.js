@@ -43,7 +43,7 @@ global.alert = () => {};
 global.window = global;
 
 function load(f){ eval(fs.readFileSync(path.join(ROOT,'assets',f),'utf8')); }
-['data.js','qgen.js','content.js','content-algebra.js','content-measurement.js','app.js'].forEach(load);
+['data.js','qgen.js','content.js','content-algebra.js','content-measurement.js','content-geometry.js','app.js'].forEach(load);
 
 let fail = 0;
 function ok(cond, msg){ console.log((cond?'  PASS  ':'  FAIL  ')+msg); if(!cond) fail++; }
@@ -137,12 +137,13 @@ function checkItem(p, where, issues){
 }
 
 const measurement = window.TOPIC_ORDER.filter(c => C[c].strandId === 5);
+const geometry = window.TOPIC_ORDER.filter(c => C[c].strandId === 4);
 
 console.log('== Content structure (all built strands) ==');
-ok(algebra.length === 14, 'strand 6 (Algebra) has 14 topics (found '+algebra.length+')');
-ok(measurement.length === 16, 'strand 5 (Measurement) has 16 topics (found '+measurement.length+')');
-ok(measurement.every(c => C[c].content), 'every Measurement topic has content');
-ok(built.length === 40, '40 topics have content (found '+built.length+')');
+ok(algebra.length === 14 && algebra.every(c => C[c].content), 'Algebra: all 14 topics built');
+ok(measurement.length === 16 && measurement.every(c => C[c].content), 'Measurement: all 16 topics built');
+ok(geometry.length === 16 && geometry.every(c => C[c].content), 'Geometry: all 16 topics built');
+ok(built.length === 56, '56 topics have content (found '+built.length+')');
 built.forEach(code => {
   const t = C[code], k = t.content;
   const issues = [];

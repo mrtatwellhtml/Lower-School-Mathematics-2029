@@ -114,6 +114,10 @@ sup{font-size:.72em}
 .frac{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;margin:0 2px;font-size:.9em}
 .frac span:first-child{border-bottom:1.5px solid currentColor;padding:0 4px}
 .frac span:last-child{padding:0 4px}
+/* column vector — stacked like a fraction but bracketed, with no dividing line */
+.vec{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;margin:0 3px;
+     font-size:.9em;line-height:1.25;padding:2px 6px;border-left:2px solid currentColor;
+     border-right:2px solid currentColor;border-radius:4px}
 
 /* Practice */
 .pq{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0;background:#fff}

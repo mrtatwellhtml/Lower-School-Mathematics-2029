@@ -25,16 +25,17 @@ math-review-site/
 │   ├── qgen.js             Helpers for the randomly generated practice questions
 │   ├── content.js              Notes/examples/practice — Number strand (Forms 1–3)
 │   ├── content-algebra.js      Notes/examples/practice — Algebra strand (Forms 1–3)
-│   └── content-measurement.js  Notes/examples/practice — Measurement strand (Forms 1–3)
+│   ├── content-measurement.js  Notes/examples/practice — Measurement strand (Forms 1–3)
+│   └── content-geometry.js     Notes/examples/practice — Geometry strand (+ SVG diagrams)
 ├── tools/verify.js         Headless test suite (node tools/verify.js)
 └── README.md
 ```
 
 `data.js` gives every topic a page (objectives + prerequisites). The `content*.js` files —
-one per strand — add the rich content. Three strands are fully built so far (**40 of the
-70 topics**): **Number Operations & Number Theory** (10), **Algebra** (14) and
-**Measurement** (16). The other three strands show their objectives and a "coming soon"
-note until their content is authored the same way.
+one per strand — add the rich content. Four strands are fully built so far (**56 of the
+70 topics**): **Number Operations & Number Theory** (10), **Algebra** (14),
+**Measurement** (16) and **Geometry** (16). The other two strands show their objectives
+and a "coming soon" note until their content is authored the same way.
 
 ## Run it locally
 
