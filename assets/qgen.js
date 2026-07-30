@@ -74,6 +74,56 @@
     return { options:opts, answer:opts.indexOf(String(correct)) };
   }
 
+  /* ---- inline SVG diagram primitives ----
+     Shared by the Geometry, Sets and Statistics strands. Plain markup, no runtime
+     dependency, nothing fetched — the diagram is part of the note's HTML. */
+  var INK='#24435e', ACC='#2b7fd4', FILL='#e8f1fa';
+  function dia(w,h,body){
+    return '<svg class="dia" viewBox="0 0 '+w+' '+h+'" role="img" '+
+           'style="max-width:'+w+'px" xmlns="http://www.w3.org/2000/svg">'+body+'</svg>';
+  }
+  function ln(x1,y1,x2,y2,c,sw){
+    return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+
+           '" stroke="'+(c||INK)+'" stroke-width="'+(sw||2)+'" stroke-linecap="round"/>';
+  }
+  function txt(x,y,s,c,sz){
+    return '<text x="'+x+'" y="'+y+'" fill="'+(c||INK)+'" font-size="'+(sz||13)+
+           '" font-family="system-ui,sans-serif" text-anchor="middle">'+s+'</text>';
+  }
+  function polyg(pts,fill){
+    return '<polygon points="'+pts+'" fill="'+(fill||FILL)+'" stroke="'+INK+'" stroke-width="2"/>';
+  }
+  function rect(x,y,w,h,fill){
+    return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+(fill||FILL)+
+           '" stroke="'+INK+'" stroke-width="2"/>';
+  }
+  function circ(cx,cy,r,fill,c){
+    return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+(fill||'none')+
+           '" stroke="'+(c||INK)+'" stroke-width="2"/>';
+  }
+  function arc(cx,cy,r,a1,a2,c){
+    var rad=function(d){ return d*Math.PI/180; };
+    var x1=cx+r*Math.cos(rad(a1)), y1=cy-r*Math.sin(rad(a1));
+    var x2=cx+r*Math.cos(rad(a2)), y2=cy-r*Math.sin(rad(a2));
+    var big=(Math.abs(a2-a1)>180)?1:0;
+    return '<path d="M '+x1.toFixed(1)+' '+y1.toFixed(1)+' A '+r+' '+r+' 0 '+big+' 0 '+
+           x2.toFixed(1)+' '+y2.toFixed(1)+'" fill="none" stroke="'+(c||ACC)+'" stroke-width="2"/>';
+  }
+  function rightAngle(x,y,dx,dy){
+    return '<path d="M '+(x+dx)+' '+y+' L '+(x+dx)+' '+(y+dy)+' L '+x+' '+(y+dy)+
+           '" fill="none" stroke="'+ACC+'" stroke-width="2"/>';
+  }
+  // a filled pie slice from angle a1 to a2 (degrees, anticlockwise from east)
+  function slice(cx,cy,r,a1,a2,fill){
+    var rad=function(d){ return d*Math.PI/180; };
+    var x1=cx+r*Math.cos(rad(a1)), y1=cy-r*Math.sin(rad(a1));
+    var x2=cx+r*Math.cos(rad(a2)), y2=cy-r*Math.sin(rad(a2));
+    var big=(a2-a1>180)?1:0;
+    return '<path d="M '+cx+' '+cy+' L '+x1.toFixed(1)+' '+y1.toFixed(1)+' A '+r+' '+r+' 0 '+
+           big+' 0 '+x2.toFixed(1)+' '+y2.toFixed(1)+' Z" fill="'+(fill||FILL)+
+           '" stroke="'+INK+'" stroke-width="2"/>';
+  }
+
   // ---- answer-list builders ----
   // round to dp decimal places, killing floating-point dust (3.14*49 -> 153.86, not 153.86000000000001)
   function fix(v,dp){ var m=Math.pow(10,dp==null?2:dp); return Math.round(v*m)/m; }
@@ -110,5 +160,9 @@
               frac:frac, num:num, sup:sup, pow:pow, sub:sub,
               poly:poly, polyHtml:polyHtml, polyAns:polyAns, mc:mc,
               dec:dec, fix:fix, money:money, ineq:ineq, stdform:stdform, root:root,
-              toBase:toBase, fromBase:fromBase };
+              toBase:toBase, fromBase:fromBase,
+              // diagram primitives + the shared palette
+              dia:dia, ln:ln, txt:txt, polyg:polyg, rect:rect, circ:circ,
+              arc:arc, rightAngle:rightAngle, slice:slice,
+              INK:INK, ACC:ACC, FILL:FILL };
 })();

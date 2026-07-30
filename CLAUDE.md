@@ -38,12 +38,15 @@ assets/
   app.js        Rendering (renderHome/renderStrand/renderTopic) + progress (window.Progress).
   data.js       AUTO-GENERATED. All 70 topics: code, form, strand, name, objectives[],
                 prereq[], quizItems, classroomUrl. Do not hand-edit objectives.
-  qgen.js       window.QG — random-number/formatting helpers for generated practice.
+  qgen.js       window.QG — random-number/formatting helpers for generated practice,
+                plus the shared inline-SVG primitives (dia/ln/txt/polyg/rect/circ/
+                arc/rightAngle/slice) used by Geometry, Sets and Statistics.
   content.js             Hand-authored content — Number strand, attached via set('code',{...}).
   content-algebra.js     Same pattern — Algebra strand.
   content-measurement.js Same pattern — Measurement strand.
-  content-geometry.js    Same pattern — Geometry strand; also holds the inline-SVG
-                         diagram helpers (dia/ln/txt/poly/arc/rightAngle, and vec()).
+  content-geometry.js    Same pattern — Geometry strand (+ vec() for column vectors).
+  content-sets.js        Same pattern — Sets, Relations & Functions (+ venn2()).
+  content-statistics.js  Same pattern — Statistics & Probability (+ bars(), pie()).
 tools/
   verify.js     Headless test suite. `node tools/verify.js` — run it after any change.
 ```
@@ -140,25 +143,28 @@ Mastery threshold = **80%** (`MASTERY` const). Scoring 80%+ on on-site practice 
 
 ## Status — done vs. next
 
-**Done:** site skeleton; two-group split; self-tracking + dashboards; all 70 topics have
-objectives + prerequisites. Four strands fully built (56 of 70 topics):
+**Done — content is COMPLETE.** All **70 of 70 topics** have objectives, prerequisites,
+notes, worked examples and generated practice. All six strands are fully built:
 - **Number Operations & Number Theory** (10) — F1: 1.1.1–1.1.6, F2: 2.1.1–2.1.3, F3: 3.1.1.
-- **Algebra** (14) — F1: 1.6.1, 1.6.2, 1.6.6; F2: 2.6.1–2.6.4; F3: 3.6.1–3.6.7.
-- **Measurement** (16) — F1: 1.5.1–1.5.6, F2: 2.5.1–2.5.6, F3: 3.5.1–3.5.4.
+- **Sets, Relations & Functions** (9) — F1: 1.2.1–1.2.2, F2: 2.2.1–2.2.4, F3: 3.2.1–3.2.3.
+- **Statistics & Probability** (5) — F1: 1.3.1–1.3.2, F2: 2.3.1–2.3.2, F3: 3.3.1.
 - **Geometry** (16) — F1: 1.4.1–1.4.6, F2: 2.4.1–2.4.4, F3: 3.4.1–3.4.6.
+- **Measurement** (16) — F1: 1.5.1–1.5.6, F2: 2.5.1–2.5.6, F3: 3.5.1–3.5.4.
+- **Algebra** (14) — F1: 1.6.1, 1.6.2, 1.6.6; F2: 2.6.1–2.6.4; F3: 3.6.1–3.6.7.
 
-The other two strands (Sets & Functions, Statistics) render objectives + prerequisites
-with a "content coming soon" note.
+Also done: site skeleton, two-group split, self-tracking + dashboards, generated practice
+throughout, ~30 inline SVG diagrams, and `tools/verify.js`. Deployed on GitHub Pages at
+`https://mrtatwellhtml.github.io/Lower-School-Mathematics-2029/`.
 
-**Next (suggested order):**
-1. Author the last two strands — **Sets, Relations & Functions (2, 9 topics)** and
-   **Statistics & Probability (3, 5 topics)**, 14 between them. Use the per-strand file
-   convention above; pull objectives/prereqs context from the framework docx. Statistics
-   will want bar/pie chart diagrams — reuse the SVG helpers from `content-geometry.js`.
-2. Create the Google Form Mastery Quizzes and paste each share link into the matching
-   topic's `classroomUrl` in `data.js`.
-3. Build the diagnostic pre-test (Google Form) and link it on the home page.
-4. Optional: a printable topic view; MathJax/KaTeX if richer notation is wanted.
+The "content coming soon" branch in `renderTopic` is now unreachable, but leave it — it
+would be needed again if the curriculum ever adds a topic.
+
+**Next (all of it needs the teacher, not code):**
+1. Create the Google Form Mastery Quizzes and paste each share link into the matching
+   topic's `classroomUrl` in `data.js`. This is the biggest remaining job — 70 forms.
+2. Build the diagnostic pre-test (Google Form) and link it on the home page.
+3. Optional polish: a printable topic view; MathJax/KaTeX if richer notation is wanted;
+   more practice items per topic (currently 4–6).
 
 ## Working conventions & gotchas
 

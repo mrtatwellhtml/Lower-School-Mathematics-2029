@@ -12,36 +12,9 @@
   function vec(a,b){ return '<span class="vec"><span>'+Q.num(a)+'</span><span>'+Q.num(b)+'</span></span>'; }
   function set(code,content){ if(C[code]) C[code].content=content; }
 
-  // ---- diagram helpers -------------------------------------------------
-  var INK='#24435e', ACC='#2b7fd4', FILL='#e8f1fa';
-  function dia(w,h,body){
-    return '<svg class="dia" viewBox="0 0 '+w+' '+h+'" role="img" '+
-           'style="max-width:'+w+'px" xmlns="http://www.w3.org/2000/svg">'+body+'</svg>';
-  }
-  function ln(x1,y1,x2,y2,c,sw){
-    return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+
-           '" stroke="'+(c||INK)+'" stroke-width="'+(sw||2)+'" stroke-linecap="round"/>';
-  }
-  function txt(x,y,s,c,sz){
-    return '<text x="'+x+'" y="'+y+'" fill="'+(c||INK)+'" font-size="'+(sz||13)+
-           '" font-family="system-ui,sans-serif" text-anchor="middle">'+s+'</text>';
-  }
-  function poly(pts,fill){
-    return '<polygon points="'+pts+'" fill="'+(fill||FILL)+'" stroke="'+INK+'" stroke-width="2"/>';
-  }
-  // an arc marking an angle at (cx,cy) between two directions, radius r
-  function arc(cx,cy,r,a1,a2,c){
-    var rad=function(d){ return d*Math.PI/180; };
-    var x1=cx+r*Math.cos(rad(a1)), y1=cy-r*Math.sin(rad(a1));
-    var x2=cx+r*Math.cos(rad(a2)), y2=cy-r*Math.sin(rad(a2));
-    var big=(Math.abs(a2-a1)>180)?1:0;
-    return '<path d="M '+x1.toFixed(1)+' '+y1.toFixed(1)+' A '+r+' '+r+' 0 '+big+' 0 '+
-           x2.toFixed(1)+' '+y2.toFixed(1)+'" fill="none" stroke="'+(c||ACC)+'" stroke-width="2"/>';
-  }
-  function rightAngle(x,y,dx,dy){   // small square marking a right angle
-    return '<path d="M '+(x+dx)+' '+y+' L '+(x+dx)+' '+(y+dy)+' L '+x+' '+(y+dy)+
-           '" fill="none" stroke="'+ACC+'" stroke-width="2"/>';
-  }
+  // ---- diagram helpers: shared primitives from qgen.js ------------------
+  var INK=Q.INK, ACC=Q.ACC, FILL=Q.FILL;
+  var dia=Q.dia, ln=Q.ln, txt=Q.txt, poly=Q.polyg, arc=Q.arc, rightAngle=Q.rightAngle;
 
   /* ============================ FORM 1 ============================ */
 

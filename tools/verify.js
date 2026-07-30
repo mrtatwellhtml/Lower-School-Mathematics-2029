@@ -43,7 +43,7 @@ global.alert = () => {};
 global.window = global;
 
 function load(f){ eval(fs.readFileSync(path.join(ROOT,'assets',f),'utf8')); }
-['data.js','qgen.js','content.js','content-algebra.js','content-measurement.js','content-geometry.js','app.js'].forEach(load);
+['data.js','qgen.js','content.js','content-algebra.js','content-measurement.js','content-geometry.js','content-sets.js','content-statistics.js','app.js'].forEach(load);
 
 let fail = 0;
 function ok(cond, msg){ console.log((cond?'  PASS  ':'  FAIL  ')+msg); if(!cond) fail++; }
@@ -134,6 +134,11 @@ function checkItem(p, where, issues){
   if(/¹/.test(String(p.q)) && !/¹[⁰¹²³⁴⁵⁶⁷⁸⁹]/.test(String(p.q)))
     issues.push(where+' writes an index of 1: '+p.q);
   if(p.hint && /undefined|NaN|Infinity/.test(p.hint)) issues.push(where+' hint contains undefined/NaN');
+  // "a letter is chosen from the word X" is only unambiguous if X has no repeated letter,
+  // otherwise the sample-space size is arguably either the length or the distinct count
+  const w = /word ([A-Z]{3,})/.exec(String(p.q));
+  if(w && new Set(w[1].split('')).size !== w[1].length)
+    issues.push(where+' uses a word with a repeated letter, making the sample space ambiguous: '+w[1]);
 }
 
 const measurement = window.TOPIC_ORDER.filter(c => C[c].strandId === 5);
@@ -143,7 +148,8 @@ console.log('== Content structure (all built strands) ==');
 ok(algebra.length === 14 && algebra.every(c => C[c].content), 'Algebra: all 14 topics built');
 ok(measurement.length === 16 && measurement.every(c => C[c].content), 'Measurement: all 16 topics built');
 ok(geometry.length === 16 && geometry.every(c => C[c].content), 'Geometry: all 16 topics built');
-ok(built.length === 56, '56 topics have content (found '+built.length+')');
+ok(built.length === 70, 'ALL 70 topics have content (found '+built.length+')');
+ok(window.STRANDS.every(function(s){ return window.TOPIC_ORDER.filter(function(c){return C[c].strandId===s.id;}).every(function(c){return C[c].content;}); }), 'every strand is fully built — no "coming soon" topics remain');
 built.forEach(code => {
   const t = C[code], k = t.content;
   const issues = [];
