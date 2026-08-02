@@ -510,7 +510,9 @@
           answer:Q.stdform(A,n), hint:'Move the point '+n+' places.'};
       }},
       {gen:function(){
-        var A=(Q.int(11,99)/10), n=Q.int(2,5), val=A*Math.pow(10,n);
+        var A=(Q.int(11,99)/10), n=Q.int(2,5), val=Math.round(A*Math.pow(10,n));
+        // Math.round is essential: 4.6 × 10⁵ evaluates to 459999.99999999994 in floating
+        // point, and storing that string marks a student typing 460000 WRONG.
         return {type:'text', q:'Write '+A+' × 10'+Q.sup(n)+' as an ordinary number.',
           answer:[String(val)], hint:'Move the point '+n+' places right.'};
       }},

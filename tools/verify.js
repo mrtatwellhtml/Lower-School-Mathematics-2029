@@ -139,6 +139,39 @@ function checkItem(p, where, issues){
   const w = /word ([A-Z]{3,})/.exec(String(p.q));
   if(w && new Set(w[1].split('')).size !== w[1].length)
     issues.push(where+' uses a word with a repeated letter, making the sample space ambiguous: '+w[1]);
+  /* Floating-point dust. 4.6 × 10^5 evaluates to 459999.99999999994, and storing that
+     string marks a student who types the correct 460000 WRONG. Any answer carrying more
+     than four decimal places is almost certainly unrounded float error, not real precision. */
+  if(p.type === 'text'){
+    const ans = Array.isArray(p.answer) ? p.answer : [p.answer];
+    ans.forEach(a => { if(/\d\.\d{5,}/.test(String(a)))
+      issues.push(where+' answer has floating-point dust (round it): "'+a+'"'); });
+  }
+}
+
+/* Every coordinate an SVG draws must land inside its own viewBox, or it is silently
+   clipped. This is what caught a circle diagram whose chord endpoints floated outside
+   the circle and whose "tangent" missed it entirely. */
+function checkDiagram(svg, where, issues){
+  const vb = /viewBox="0 0 (\d+) (\d+)"/.exec(svg);
+  if(!vb){ issues.push(where+' svg has no viewBox'); return; }
+  const W = +vb[1], H = +vb[2], pt = [];
+  (svg.match(/(?:x1|x2|cx|x)="(-?[\d.]+)"/g)||[]).forEach(m => pt.push(['x', +/"(-?[\d.]+)"/.exec(m)[1]]));
+  (svg.match(/(?:y1|y2|cy|y)="(-?[\d.]+)"/g)||[]).forEach(m => pt.push(['y', +/"(-?[\d.]+)"/.exec(m)[1]]));
+  (svg.match(/points="([^"]+)"/g)||[]).forEach(m =>
+    /"([^"]+)"/.exec(m)[1].trim().split(/\s+/).forEach(p => {
+      const [a,b] = p.split(','); pt.push(['x', +a]); pt.push(['y', +b]); }));
+  pt.forEach(([axis,v]) => {
+    const lim = axis === 'x' ? W : H;
+    if(v < -2 || v > lim + 2) issues.push(where+' draws '+axis+'='+v+' outside the 0..'+lim+' canvas');
+  });
+  (svg.match(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"/g)||[]).forEach(m => {
+    const c = /cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"/.exec(m);
+    const cx = +c[1], cy = +c[2], r = +c[3];
+    if(cx-r < -2 || cx+r > W+2 || cy-r < -2 || cy+r > H+2)
+      issues.push(where+' circle r='+r+' at ('+cx+','+cy+') overflows the '+W+'x'+H+' canvas');
+  });
+  if(/NaN|undefined/.test(svg)) issues.push(where+' svg contains NaN/undefined');
 }
 
 const measurement = window.TOPIC_ORDER.filter(c => C[c].strandId === 5);
@@ -217,6 +250,17 @@ built.forEach(code => {
 });
 ok(bad.length === 0, 'no unescaped angle brackets in notes or generated questions'+
    (bad.length?'\n           -> '+bad.slice(0,6).join('\n           -> '):''));
+
+console.log('== Diagram geometry ==');
+{
+  let n = 0; const issues = [];
+  built.forEach(code => (C[code].content.notes||[]).forEach((note,i) =>
+    (note.html.match(/<svg[\s\S]*?<\/svg>/g)||[]).forEach(svg => {
+      n++; checkDiagram(svg, code+' note'+(i+1), issues); })));
+  ok(n >= 25, n+' inline SVG diagrams found across the notes');
+  ok(issues.length === 0, 'every diagram draws inside its own canvas'+
+     (issues.length?'\n           -> '+issues.slice(0,6).join('\n           -> '):''));
+}
 
 console.log('== Page rendering ==');
 window.renderHome();
