@@ -7,6 +7,8 @@
 (function(){
   var C=window.CURRICULUM; if(!C) return;
   var Q=window.QG;
+  var INK=Q.INK, ACC=Q.ACC, FILL=Q.FILL;
+  var dia=Q.dia, ln=Q.ln, txt=Q.txt, rect=Q.rect, circ=Q.circ, slice=Q.slice, polyg=Q.polyg;
   function f(a,b){ return '<span class="frac"><span>'+a+'</span><span>'+b+'</span></span>'; } // fraction
   function set(code,content){ if(C[code]) C[code].content=content; }
 
@@ -458,7 +460,17 @@
         '<li><b>Circumference (C)</b> — the distance all the way round (the circle\'s perimeter).</li>'+
         '<li><b>Chord</b> — a straight line joining two points on the edge (a diameter is the longest chord).</li>'+
         '<li><b>Arc</b> — part of the circumference. <b>Sector</b> — a "pizza slice". <b>Segment</b> — the piece cut off by a chord.</li>'+
-        '<li><b>Tangent</b> — a line touching the circle at exactly one point.</li></ul>'},
+        '<li><b>Tangent</b> — a line touching the circle at exactly one point.</li></ul>'+
+        /* Every labelled point below sits exactly on the circle (centre 150,100, r 78):
+           the chord ends at 200° and 320°, and the tangent touches at (150,178). */
+        dia(320,215,
+          circ(150,100,78,FILL)+
+          ln(72,100,228,100)+txt(112,116,'diameter',INK,12)+
+          ln(150,100,189,33,ACC)+txt(198,56,'radius',ACC,12)+
+          '<circle cx="150" cy="100" r="4" fill="'+INK+'"/>'+txt(142,117,'O',INK,12)+
+          ln(77,127,210,150,'#c0392b')+txt(258,152,'chord','#c0392b',12)+
+          ln(70,178,230,178,'#7a5200')+txt(150,196,'tangent','#7a5200',12)+
+          txt(150,14,'circumference',INK,12))},
       {h:'Where π comes from', html:
         '<p>Measure the circumference and diameter of <i>any</i> circle and divide. You always get the same number, a little over 3. That number is <b>π (pi)</b>.</p>'+
         '<div class="formula">π = '+f('C','d')+' ≈ 3.14 ≈ '+f('22','7')+'</div>'+
@@ -532,7 +544,14 @@
         '<ul><li><b>Add:</b> cut it into rectangles/triangles/semicircles, find each area, add them.</li>'+
         '<li><b>Subtract:</b> draw the big rectangle around it and take away the missing piece — often quicker for an L-shape.</li></ul>'+
         '<p>Always mark on any missing lengths first: opposite sides of the whole shape must agree.</p>'+
-        '<div class="formula">Area of L-shape = big rectangle − cut-out rectangle</div>'},
+        dia(300,180,
+          '<path d="M 30 30 L 200 30 L 200 90 L 260 90 L 260 150 L 30 150 Z" fill="'+FILL+
+          '" stroke="'+INK+'" stroke-width="2"/>'+
+          ln(200,90,200,150,ACC)+          // the only INTERNAL line — the rest is the outline
+          txt(200,166,'split here',ACC,11)+
+          txt(115,95,'A',INK,15)+txt(230,125,'B',INK,15))+
+        '<div class="formula">Area of L-shape = big rectangle − cut-out rectangle<br>'+
+        '(or simply area A + area B)</div>'},
       {h:'Perimeter of a compound shape', html:
         '<p><b>Only go around the outside.</b> The internal lines you drew to split the shape are <i>not</i> part of the perimeter — a very common slip.</p>'+
         '<p>For shapes with a curved edge, add the arc length. A semicircle contributes '+f('πd','2')+', a quarter circle '+f('πd','4')+'.</p>'},
@@ -614,6 +633,12 @@
         '<li><b>Cube:</b> V = s³</li>'+
         '<li><b>Triangular prism:</b> V = ('+f('1','2')+' × b × h) × length</li>'+
         '<li><b>Cylinder:</b> V = πr² × h</li></ul>'+
+        dia(280,170,
+          polyg('40,60 170,60 170,140 40,140',FILL)+
+          polyg('40,60 80,25 210,25 170,60','rgba(43,127,212,0.18)')+
+          polyg('170,60 210,25 210,105 170,140','rgba(36,67,94,0.12)')+
+          txt(105,155,'length',INK,12)+txt(28,102,'height',INK,12)+txt(196,48,'width',INK,12)+
+          txt(105,105,'V = l × w × h',ACC,13))+
         '<p>All three dimensions must be in the <b>same unit</b> before you multiply.</p>'},
     ],
     examples:[
@@ -806,7 +831,16 @@
       {h:'Arcs and sectors', html:
         '<p>A <b>sector</b> is a slice of a circle bounded by two radii and an arc. The angle at the centre, <b>θ</b>, tells you what fraction of the whole circle you have.</p>'+
         '<div class="formula">fraction of the circle = '+f('θ','360')+'</div>'+
-        '<p>A quarter circle (quadrant) is θ = 90°, i.e. '+f('1','4')+'. A semicircle is θ = 180°, i.e. '+f('1','2')+'.</p>'},
+        '<p>A quarter circle (quadrant) is θ = 90°, i.e. '+f('1','4')+'. A semicircle is θ = 180°, i.e. '+f('1','2')+'.</p>'+
+        /* Sector shaded from 20° to 90°; the two 'r' labels sit beside those two radii
+           and 'arc' sits just outside the arc's midpoint at 55°. */
+        dia(280,195,
+          circ(120,105,74,'#fff','#c8d6e2')+
+          slice(120,105,74,20,90,FILL)+
+          txt(138,86,'θ',ACC,14)+
+          txt(106,68,'r',INK,12)+txt(160,101,'r',INK,12)+
+          txt(180,32,'arc',ACC,12)+
+          txt(120,186,'a sector: two radii and an arc',INK,11))},
       {h:'The two formulas', html:
         '<div class="formula">Arc length = '+f('θ','360')+' × 2πr&nbsp;&nbsp;·&nbsp;&nbsp;Sector area = '+f('θ','360')+' × πr²</div>'+
         '<p>Both are just "that fraction of the whole circle" — take the circumference or area formula and scale it by '+f('θ','360')+'.</p>'+

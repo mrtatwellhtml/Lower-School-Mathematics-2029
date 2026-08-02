@@ -1,6 +1,6 @@
 /* Full content for the Number Operations & Number Theory strand (Forms 1-3).
-   Attaches .content to topics in window.CURRICULUM. Other strands render objectives
-   + prerequisites from data.js and show "content coming soon". */
+   Attaches .content to topics in window.CURRICULUM. Each of the six strands has its
+   own content file; all 70 topics are built. */
 (function(){
   var C=window.CURRICULUM; if(!C) return;
   var Q=window.QG;   // question generators — see qgen.js
@@ -80,17 +80,28 @@
   set('1.1.2', {
     notes:[
       {h:'What a fraction means', html:
-        '<p>A fraction '+f('a','b')+' shows <b>a parts out of b equal parts</b>. The top is the <b>numerator</b>, the bottom the <b>denominator</b>.</p>'+
-        '<ul><li><b>Proper</b>: top &lt; bottom ('+f('3','4')+').</li>'+
-        '<li><b>Improper</b>: top ≥ bottom ('+f('7','4')+').</li>'+
-        '<li><b>Mixed</b>: whole + fraction (1'+f('3','4')+').</li></ul>'},
+        '<p>A fraction '+f('a','b')+' shows <b>a parts out of b equal parts</b>. The word "equal" matters — cutting a cake into four uneven pieces does not give quarters.</p>'+
+        '<ul><li>The top number is the <b>numerator</b> — how many parts you have.</li>'+
+        '<li>The bottom is the <b>denominator</b> — how many parts the whole was split into.</li></ul>'+
+        '<p>The bigger the denominator, the <i>smaller</i> each piece: '+f('1','8')+' is less than '+f('1','3')+'.</p>'+
+        '<ul><li><b>Proper</b>: top &lt; bottom ('+f('3','4')+') — less than one whole.</li>'+
+        '<li><b>Improper</b>: top ≥ bottom ('+f('7','4')+') — one whole or more.</li>'+
+        '<li><b>Mixed</b>: a whole number and a fraction together (1'+f('3','4')+').</li></ul>'+
+        '<p>Improper and mixed are two ways of writing the <i>same</i> amount: '+f('7','4')+' = 1'+f('3','4')+'.</p>'},
       {h:'Equivalent fractions', html:
         '<p>Multiply or divide top and bottom by the <b>same</b> number to get an equal fraction.</p>'+
         '<div class="formula">'+f('1','2')+' = '+f('2','4')+' = '+f('3','6')+' = '+f('50','100')+'</div>'+
         '<p><b>Simplify</b> by dividing both parts by their HCF. '+f('12','18')+' ÷ 6 = '+f('2','3')+'.</p>'},
       {h:'Comparing & ordering', html:
-        '<p>Rewrite fractions with a <b>common denominator</b>, then compare numerators.</p>'+
-        '<p>Compare '+f('2','3')+' and '+f('3','5')+': common denominator 15 → '+f('10','15')+' vs '+f('9','15')+', so '+f('2','3')+' is larger.</p>'},
+        '<p>You can only compare fractions directly when the pieces are the same size — so rewrite them with a <b>common denominator</b>, then compare the numerators.</p>'+
+        '<p>Compare '+f('2','3')+' and '+f('3','5')+': the LCM of 3 and 5 is 15, giving '+f('10','15')+' vs '+f('9','15')+'. So '+f('2','3')+' is larger.</p>'+
+        '<p>Converting each to a decimal works too: 2 ÷ 3 = 0.667 and 3 ÷ 5 = 0.6.</p>'},
+      {h:'Converting between mixed and improper', html:
+        '<p><b>Mixed → improper:</b> multiply the whole number by the denominator, add the numerator, keep the denominator.</p>'+
+        '<div class="formula">2'+f('3','5')+' → (2 × 5) + 3 = 13 → '+f('13','5')+'</div>'+
+        '<p><b>Improper → mixed:</b> divide the top by the bottom. The quotient is the whole number and the remainder becomes the new numerator.</p>'+
+        '<div class="formula">'+f('17','5')+' → 17 ÷ 5 = 3 remainder 2 → 3'+f('2','5')+'</div>'+
+        '<p>Answers are usually left as mixed numbers, but improper fractions are easier to calculate with — convert to improper first when multiplying or dividing.</p>'},
     ],
     examples:[
       {q:'Simplify '+f('24','36')+' to its lowest terms.', answer:f('2','3'),
@@ -190,16 +201,29 @@
 
   set('1.1.4', {
     notes:[
-      {h:'Decimals are fractions', html:
-        '<p>Decimal places continue place value <b>past the point</b>: tenths, hundredths, thousandths.</p>'+
-        '<div class="formula">0.<b>4</b> = '+f('4','10')+' &nbsp; 0.0<b>7</b> = '+f('7','100')+' &nbsp; 0.4 = '+f('40','100')+'</div>'},
-      {h:'Operations with decimals', html:
-        '<ul><li><b>Add/subtract:</b> line up the decimal points, then work as usual.</li>'+
-        '<li><b>Multiply:</b> ignore points, multiply, then put back the total number of decimal places.</li>'+
-        '<li><b>Divide by a decimal:</b> multiply both numbers by 10, 100… until the divisor is whole.</li></ul>'},
+      {h:'Decimals continue place value', html:
+        '<p>A decimal point does not start a new system — it simply continues the place-value columns <b>past the units</b>, each one ten times smaller than the last.</p>'+
+        '<div class="formula">Hundreds · Tens · <b>Units</b> · <b>.</b> · tenths · hundredths · thousandths</div>'+
+        '<p>So in <b>3.4<u>7</u>2</b> the 7 is in the <i>hundredths</i> column and means '+f('7','100')+'.</p>'+
+        '<p>Every decimal place is a fraction with a power of ten underneath:</p>'+
+        '<div class="formula">0.<b>4</b> = '+f('4','10')+' &nbsp;·&nbsp; 0.0<b>7</b> = '+f('7','100')+' &nbsp;·&nbsp; 0.00<b>3</b> = '+f('3','1000')+'</div>'+
+        '<p>Adding a zero on the <b>end</b> of a decimal changes nothing: 0.4 = 0.40 = 0.400. That is why 0.4 and 0.40 are the same number, and it is the trick that makes comparing easy.</p>'},
+      {h:'Comparing and ordering', html:
+        '<p>Never compare by length — 0.7 is bigger than 0.68, even though 68 looks like the larger number.</p>'+
+        '<p>Give every decimal the <b>same number of decimal places</b> by padding with zeros, then compare column by column from the left:</p>'+
+        '<div class="formula">0.7 → 0.<b>7</b>00&nbsp;&nbsp;0.68 → 0.<b>6</b>80&nbsp;&nbsp;0.702 → 0.<b>7</b>02<br>'+
+        'tenths first: 7, 6, 7 → 0.68 is smallest; then 0.700 vs 0.702 → 0.702 is largest</div>'},
+      {h:'The four operations', html:
+        '<ul><li><b>Add / subtract:</b> line the decimal <b>points</b> up underneath each other — not the last digits — then work as usual. Pad with zeros so both have the same length.</li>'+
+        '<li><b>Multiply:</b> ignore the points and multiply as whole numbers. Then count the decimal places in the <i>question</i> and put that many into the answer. 3.7 × 0.4 → 37 × 4 = 148, and 1 + 1 = 2 places → 1.48.</li>'+
+        '<li><b>Divide by a whole number:</b> divide as usual, keeping the point in line.</li>'+
+        '<li><b>Divide by a decimal:</b> multiply <b>both</b> numbers by 10, 100… until the divisor is a whole number. 6 ÷ 0.2 becomes 60 ÷ 2 = 30.</li></ul>'+
+        '<p>Notice that dividing by a number below 1 makes the answer <i>bigger</i> — worth an estimate to check.</p>'},
       {h:'Converting', html:
-        '<p><b>Fraction → decimal:</b> divide top by bottom. '+f('3','8')+' = 3 ÷ 8 = 0.375.</p>'+
-        '<p><b>Decimal → fraction:</b> write over 10, 100… then simplify. 0.6 = '+f('6','10')+' = '+f('3','5')+'.</p>'},
+        '<p><b>Fraction → decimal:</b> divide the top by the bottom. '+f('3','8')+' = 3 ÷ 8 = 0.375.</p>'+
+        '<p><b>Decimal → fraction:</b> write it over 10, 100 or 1000 (one zero per decimal place), then simplify.</p>'+
+        '<div class="formula">0.6 = '+f('6','10')+' = '+f('3','5')+'&nbsp;&nbsp;·&nbsp;&nbsp;0.25 = '+f('25','100')+' = '+f('1','4')+'</div>'+
+        '<p>A fraction gives a <b>terminating</b> decimal when its denominator is built only from 2s and 5s ('+f('1','8')+' = 0.125). Otherwise it <b>recurs</b>: '+f('1','3')+' = 0.333…</p>'},
     ],
     examples:[
       {q:'Work out 3.7 × 0.4.', answer:'1.48',
@@ -250,14 +274,31 @@
   set('1.1.5', {
     notes:[
       {h:'Percent means “per hundred”', html:
-        '<p>A percentage is a fraction out of 100. <b>45% = '+f('45','100')+' = 0.45</b>.</p>'+
+        '<p>The word says it: <b>per cent</b> = out of 100. A percentage is just a fraction whose denominator is 100.</p>'+
+        '<div class="formula">45% = '+f('45','100')+' = 0.45</div>'+
+        '<p>That makes percentages the easiest way to <b>compare</b> proportions — scoring 17 out of 20 and 21 out of 25 is hard to judge, but 85% and 84% is instant.</p>'},
+      {h:'Converting between all three forms', html:
         '<div class="formula">Fraction ⇄ Decimal ⇄ Percentage</div>'+
-        '<ul><li>Decimal → %: multiply by 100 (0.3 → 30%).</li>'+
-        '<li>% → decimal: divide by 100 (72% → 0.72).</li>'+
-        '<li>Fraction → %: '+f('3','5')+' = '+f('60','100')+' = 60%.</li></ul>'},
+        '<ul><li><b>Decimal → %:</b> multiply by 100 (move the point two places right). 0.3 → 30%.</li>'+
+        '<li><b>% → decimal:</b> divide by 100 (two places left). 72% → 0.72.</li>'+
+        '<li><b>Fraction → %:</b> make the denominator 100, or divide top by bottom then ×100. '+f('3','5')+' = '+f('60','100')+' = 60%.</li>'+
+        '<li><b>% → fraction:</b> write over 100 and simplify. 40% = '+f('40','100')+' = '+f('2','5')+'.</li></ul>'+
+        '<p>Worth memorising, because they appear constantly:</p>'+
+        '<div class="formula">'+f('1','2')+' = 50%&nbsp;·&nbsp;'+f('1','4')+' = 25%&nbsp;·&nbsp;'+f('3','4')+' = 75%&nbsp;·&nbsp;'+
+        f('1','5')+' = 20%&nbsp;·&nbsp;'+f('1','10')+' = 10%&nbsp;·&nbsp;'+f('1','3')+' ≈ 33.3%</div>'},
       {h:'Percentage of a quantity', html:
-        '<p>To find a percentage of an amount, convert to a decimal (or fraction) and multiply.</p>'+
-        '<div class="formula">15% of 240 = 0.15 × 240 = 36</div>'},
+        '<p>Convert the percentage to a decimal (or a fraction) and <b>multiply</b>.</p>'+
+        '<div class="formula">15% of 240 = 0.15 × 240 = 36</div>'+
+        '<p>For mental work, build the answer from easy pieces:</p>'+
+        '<ul><li>10% — divide by 10.</li>'+
+        '<li>5% — half of 10%.</li>'+
+        '<li>1% — divide by 100.</li></ul>'+
+        '<p>So 35% of 80 = 10% (8) × 3 + 5% (4) = 24 + 4 = <b>28</b>.</p>'},
+      {h:'The other direction', html:
+        '<p>To express one amount <b>as a percentage of</b> another, make a fraction and multiply by 100.</p>'+
+        '<div class="formula">score as a % = '+f('score','total')+' × 100</div>'+
+        '<p>18 out of 24 = '+f('18','24')+' × 100 = 0.75 × 100 = <b>75%</b>.</p>'+
+        '<p>Check the size of your answer: a part of something can never exceed 100% of it, so an answer of 750% means the fraction went in upside down.</p>'},
     ],
     examples:[
       {q:'Find 30% of 150.', answer:'45',
@@ -300,14 +341,27 @@
   set('1.1.6', {
     notes:[
       {h:'Buying and selling', html:
-        '<p><b>Cost Price (CP)</b> is what the seller paid; <b>Selling Price (SP)</b> is what the buyer pays.</p>'+
-        '<div class="formula">Profit = SP − CP &nbsp;&nbsp;·&nbsp;&nbsp; Loss = CP − SP</div>'},
-      {h:'Profit & loss as a percentage', html:
-        '<p>Percentage profit/loss is always worked out <b>on the cost price</b>.</p>'+
-        '<div class="formula">% Profit = '+f('Profit','CP')+' × 100</div>'},
-      {h:'Discount & sales tax', html:
-        '<ul><li><b>Discount</b> reduces the price: pay (100 − d)% of the marked price.</li>'+
-        '<li><b>VAT / sales tax</b> adds on: pay (100 + t)% of the price.</li></ul>'},
+        '<p><b>Cost Price (CP)</b> is what the seller paid for the item. <b>Selling Price (SP)</b> is what the buyer pays for it.</p>'+
+        '<div class="formula">Profit = SP − CP&nbsp;&nbsp;·&nbsp;&nbsp;Loss = CP − SP</div>'+
+        '<p>If SP is greater than CP the seller makes a <b>profit</b>; if it is less, a <b>loss</b>. Only one of the two formulas applies at a time — work out which by comparing the prices first.</p>'+
+        '<p>A shop buys a shirt for $60 and sells it for $85. Profit = 85 − 60 = <b>$25</b>.</p>'},
+      {h:'Profit and loss as a percentage', html:
+        '<p>A $25 profit means very different things on a $60 shirt and on a $6000 car, so we express it as a percentage.</p>'+
+        '<p><b>Percentage profit and loss are always worked out on the COST price</b> — never on the selling price. This is the single most common error in the topic.</p>'+
+        '<div class="formula">% Profit = '+f('Profit','CP')+' × 100&nbsp;&nbsp;·&nbsp;&nbsp;% Loss = '+f('Loss','CP')+' × 100</div>'+
+        '<p>The shirt above: '+f('25','60')+' × 100 = <b>41.7%</b> profit (1 d.p.).</p>'},
+      {h:'Discount and sales tax', html:
+        '<p>Both are percentage changes applied to a price, so use a single multiplier rather than working out the change and then adding it.</p>'+
+        '<ul><li><b>Discount</b> reduces the marked price: you pay <b>(100 − d)%</b> of it.</li>'+
+        '<li><b>VAT / sales tax</b> is added on: you pay <b>(100 + t)%</b>.</li></ul>'+
+        '<div class="formula">$80 with 15% off → 85% of 80 = 0.85 × 80 = $68<br>'+
+        '$200 plus 12% VAT → 112% of 200 = 1.12 × 200 = $224</div>'+
+        '<p>The one-step multiplier is quicker and much less error-prone than finding 15% and subtracting.</p>'},
+      {h:'Working backwards to the selling price', html:
+        '<p>Given the cost price and a required percentage profit, the selling price is:</p>'+
+        '<div class="formula">SP = (100 + % profit)% of CP</div>'+
+        '<p>CP $250 with 20% profit → 120% of 250 = 1.2 × 250 = <b>$300</b>.</p>'+
+        '<p>For a loss, use (100 − % loss)% instead. Always finish by checking the answer sits on the right side of the cost price — above it for a profit, below for a loss.</p>'},
     ],
     examples:[
       {q:'A phone costs the shop $600 and is sold for $750. Find the percentage profit.', answer:'25%',
@@ -354,13 +408,27 @@
   set('2.1.1', {
     notes:[
       {h:'The set of integers', html:
-        '<p><b>Integers</b> are the whole numbers together with their negatives: … −3, −2, −1, 0, 1, 2, 3 …  (symbol ℤ). No fractions or decimals.</p>'},
+        '<p><b>Integers</b> are the whole numbers together with their negatives — no fractions, no decimals.</p>'+
+        '<div class="formula">ℤ = { … −3, −2, −1, 0, 1, 2, 3 … }</div>'+
+        '<p>They model anything that runs both ways from a zero point: temperature above and below freezing, money owed and owned, floors above and below ground, metres above and below sea level.</p>'+
+        '<p>Zero is an integer, and it is neither positive nor negative.</p>'},
       {h:'Ordering integers', html:
-        '<p>On the number line, numbers <b>increase to the right</b>. So −5 &lt; −2 &lt; 0 &lt; 3. A “larger” negative digit is actually a <i>smaller</i> number: −9 &lt; −1.</p>'},
-      {h:'Operations recap', html:
-        '<p>All the directed-number rules apply.</p>'+
-        '<div class="formula">same signs × or ÷ → +&nbsp;&nbsp;·&nbsp;&nbsp;different signs → −</div>'+
-        '<p>For a chain, apply <b>order of operations</b> (brackets, then × ÷, then + −).</p>'},
+        '<p>On the number line, numbers <b>increase to the right</b> — always. So the further left a number sits, the smaller it is.</p>'+
+        '<div class="formula">−9 &nbsp; −5 &nbsp; −2 &nbsp; 0 &nbsp; 3 &nbsp; 7&nbsp;&nbsp;&nbsp;(smallest to largest)</div>'+
+        '<p>This is where negatives catch people out: <b>−9 &lt; −1</b>, even though 9 is bigger than 1. A bigger digit after the minus sign means a <i>smaller</i> number.</p>'+
+        '<p>A debt of $9 leaves you worse off than a debt of $1 — that is exactly what −9 &lt; −1 says.</p>'},
+      {h:'The sign rules', html:
+        '<p><b>Adding and subtracting:</b> two signs side by side collapse into one.</p>'+
+        '<div class="formula">+ + = +&nbsp;&nbsp;·&nbsp;&nbsp;+ − = −&nbsp;&nbsp;·&nbsp;&nbsp;− + = −&nbsp;&nbsp;·&nbsp;&nbsp;− − = +</div>'+
+        '<p>So 5 − (−3) becomes 5 + 3 = 8, and 5 + (−3) becomes 5 − 3 = 2.</p>'+
+        '<p><b>Multiplying and dividing:</b></p>'+
+        '<div class="formula">same signs → <b>+</b>&nbsp;&nbsp;·&nbsp;&nbsp;different signs → <b>−</b></div>'+
+        '<p>(−3) × (−6) = +18, but (−3) × 6 = −18. The same rule governs division.</p>'},
+      {h:'Order of operations', html:
+        '<p>In a chain of operations, work in this order:</p>'+
+        '<div class="formula"><b>B</b>rackets → <b>O</b>rders (powers) → <b>D</b>ivide / <b>M</b>ultiply → <b>A</b>dd / <b>S</b>ubtract</div>'+
+        '<p>Divide and multiply rank equally — do them left to right. The same goes for add and subtract.</p>'+
+        '<p>−4 + 3 × (−2): the multiplication comes first, giving −6, so the answer is −4 + (−6) = <b>−10</b>. Working left to right instead would wrongly give 2.</p>'},
     ],
     examples:[
       {q:'Arrange in ascending order: 3, −7, 0, −2, 5.', answer:'−7, −2, 0, 3, 5',
@@ -463,14 +531,26 @@
   set('2.1.3', {
     notes:[
       {h:'What a base means', html:
-        '<p>Our usual system is <b>base 10</b>: each column is a power of 10. In <b>base 2 (binary)</b> each column is a power of 2 and only digits 0 and 1 are used.</p>'+
-        '<div class="formula">Base 2 columns: … 16 &nbsp; 8 &nbsp; 4 &nbsp; 2 &nbsp; 1</div>'},
-      {h:'Converting to base 10', html:
-        '<p>Multiply each digit by its column value and add.</p>'+
-        '<p>1101₂ = 1×8 + 1×4 + 0×2 + 1×1 = <b>13</b>.</p>'},
-      {h:'Converting from base 10', html:
-        '<p><b>Repeatedly divide</b> by the base and read the remainders <i>bottom to top</i>.</p>'+
-        '<p>13 → 2: 13÷2 = 6 r1, 6÷2 = 3 r0, 3÷2 = 1 r1, 1÷2 = 0 r1 → read up: 1101₂.</p>'},
+        '<p>Our everyday system is <b>base 10</b> — ten digits (0–9), and each column worth ten times the one to its right: units, tens, hundreds, thousands.</p>'+
+        '<p>A different base changes two things together: <b>how many digits you may use</b>, and <b>what each column is worth</b>.</p>'+
+        '<div class="formula">Base 10 columns: … 1000 &nbsp; 100 &nbsp; 10 &nbsp; 1&nbsp;&nbsp;(powers of 10)<br>'+
+        'Base 2 columns:&nbsp; … &nbsp;&nbsp;16 &nbsp;&nbsp; 8 &nbsp;&nbsp; 4 &nbsp;&nbsp; 2 &nbsp;&nbsp; 1&nbsp;&nbsp;(powers of 2)</div>'+
+        '<p>In <b>base 2 (binary)</b> the only digits are 0 and 1 — there is no digit "2", just as base 10 has no single digit for ten. In base 3 the digits are 0, 1 and 2.</p>'+
+        '<p>We write the base as a small subscript: 1101<b>₂</b> means "1101 in base 2", which is a different number from 1101 in base 10.</p>'+
+        '<p>Binary matters because computers store everything with two states — off and on, 0 and 1.</p>'},
+      {h:'Converting TO base 10', html:
+        '<p>Write the column values above the digits, multiply each digit by its column, and add.</p>'+
+        '<div class="formula">&nbsp;8 &nbsp; 4 &nbsp; 2 &nbsp; 1&nbsp;&nbsp;← column values<br>'+
+        '&nbsp;1 &nbsp; 1 &nbsp; 0 &nbsp; 1&nbsp;&nbsp;← the digits of 1101₂<br>'+
+        '1×8 + 1×4 + 0×2 + 1×1 = <b>13</b></div>'+
+        '<p>Only the columns with a 1 contribute, so in binary you are really just adding up the column values that are switched on: 8 + 4 + 1 = 13.</p>'},
+      {h:'Converting FROM base 10', html:
+        '<p><b>Repeatedly divide</b> by the base, writing down the remainder each time, then read the remainders <b>bottom to top</b>.</p>'+
+        '<div class="formula">13 ÷ 2 = 6 remainder <b>1</b><br>&nbsp;6 ÷ 2 = 3 remainder <b>0</b><br>'+
+        '&nbsp;3 ÷ 2 = 1 remainder <b>1</b><br>&nbsp;1 ÷ 2 = 0 remainder <b>1</b><br>read upwards → <b>1101₂</b></div>'+
+        '<p>Keep dividing until you reach 0. Reading the remainders the wrong way round is the classic error — the <i>last</i> remainder is the <i>first</i> digit.</p>'+
+        '<p>Alternatively, subtract the largest column value that fits and repeat: 13 − 8 = 5, 5 − 4 = 1, 1 − 1 = 0, so the 8, 4 and 1 columns are on → 1101₂.</p>'+
+        '<p><b>Always check</b> by converting back the other way.</p>'},
     ],
     examples:[
       {q:'Convert 10110₂ to base 10.', answer:'22',
