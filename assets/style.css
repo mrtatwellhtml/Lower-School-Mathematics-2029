@@ -154,3 +154,10 @@ sup{font-size:.72em}
 .soonbox{background:var(--warnbg);border:1px dashed var(--warn);border-radius:12px;padding:16px 18px;color:#7a5200}
 footer.site{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:.85rem;text-align:center}
 @media(max-width:560px){.hero h1{font-size:1.55rem}.overall{gap:14px}}
+
+/* Practice difficulty badges */
+.plevel{display:inline-block;font-size:.66rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.3px;padding:2px 8px;border-radius:20px;margin-right:8px;vertical-align:middle}
+.plevel-basic{background:#e8f5e9;color:#2e7d32}
+.plevel-core{background:#e7f0fb;color:#1F4E79}
+.plevel-challenge{background:#fdecea;color:#b3261e}

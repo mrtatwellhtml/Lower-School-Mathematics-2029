@@ -43,7 +43,7 @@ global.alert = () => {};
 global.window = global;
 
 function load(f){ eval(fs.readFileSync(path.join(ROOT,'assets',f),'utf8')); }
-['data.js','qgen.js','content.js','content-algebra.js','content-measurement.js','content-geometry.js','content-sets.js','content-statistics.js','app.js'].forEach(load);
+['data.js','qgen.js','content.js','content-algebra.js','content-measurement.js','content-geometry.js','content-sets.js','content-statistics.js','content-book-extra.js','app.js'].forEach(load);
 
 let fail = 0;
 function ok(cond, msg){ console.log((cond?'  PASS  ':'  FAIL  ')+msg); if(!cond) fail++; }
@@ -157,7 +157,7 @@ built.forEach(code => {
   (k.notes||[]).forEach((n,i)=>{ if(!n.h||!n.html) issues.push('note '+i+' missing h/html'); });
   if(!k.examples || k.examples.length < 2) issues.push('needs >=2 examples');
   (k.examples||[]).forEach((e,i)=>{ if(!e.q||!e.answer||!Array.isArray(e.steps)||!e.steps.length) issues.push('example '+i+' incomplete'); });
-  if(!k.practice || k.practice.length < 4 || k.practice.length > 6) issues.push('practice must be 4-6, got '+(k.practice||[]).length);
+  if(!k.practice || k.practice.length < 4 || k.practice.length > 20) issues.push('practice must be 4-20, got '+(k.practice||[]).length);
   const kinds = (k.practice||[]).map(p => typeof p.gen === 'function' ? (p.gen().type||'text') : p.type);
   if(!(kinds.includes('mc') && kinds.includes('text'))) issues.push('practice should mix text and mc');
   ok(issues.length === 0, code+' '+t.name+(issues.length?' -> '+issues.join('; '):''));

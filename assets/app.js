@@ -200,11 +200,14 @@
     var g=item.gen()||{};
     if(g.type==null)   g.type=item.type||'text';
     if(g.hint==null)   g.hint=item.hint;
+    if(g.level==null)  g.level=item.level;
     return g;
   }
+  var LVRANK={ Basic:0, Core:1, Challenge:2 };
+  function lvOf(item){ return (item&&LVRANK[item.level]!=null)?LVRANK[item.level]:1; }
 
   function buildPractice(t){
-    var items=t.content.practice;
+    var items=t.content.practice.slice().sort(function(a,b){ return lvOf(a)-lvOf(b); });
     var dynamic=items.some(function(q){ return typeof q.gen==='function'; });
     var sec=el('div','section');
     sec.innerHTML='<h2>Practice — check yourself</h2>'+
@@ -225,7 +228,8 @@
       qwrap.innerHTML='';
       qs.forEach(function(q,i){
         var pq=el('div','pq'); pq.dataset.i=i;
-        var body='<div class="qn">'+(i+1)+'. '+q.q+'</div>';
+        var badge=q.level?'<span class="plevel plevel-'+q.level.toLowerCase()+'">'+q.level+'</span>':'';
+        var body='<div class="qn">'+badge+(i+1)+'. '+q.q+'</div>';
         if(q.type==='mc'){
           body+='<div class="opts">'+q.options.map(function(o,j){
             return '<label><input type="radio" name="q'+i+'" value="'+j+'"> <span>'+o+'</span></label>';
