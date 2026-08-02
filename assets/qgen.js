@@ -124,6 +124,10 @@
            '" stroke="'+INK+'" stroke-width="2"/>';
   }
 
+  /* "a" or "an" for a word — octagon, isosceles triangle and equilateral triangle all
+     need "an", and getting it wrong is the kind of thing students notice. */
+  function an(word){ return ('aeiou'.indexOf(String(word).charAt(0).toLowerCase())>-1?'an ':'a ')+word; }
+
   // ---- answer-list builders ----
   // round to dp decimal places, killing floating-point dust (3.14*49 -> 153.86, not 153.86000000000001)
   function fix(v,dp){ var m=Math.pow(10,dp==null?2:dp); return Math.round(v*m)/m; }
@@ -159,7 +163,7 @@
               gcd:gcd, lcm:lcm, simp:simp, coprime:coprime,
               frac:frac, num:num, sup:sup, pow:pow, sub:sub,
               poly:poly, polyHtml:polyHtml, polyAns:polyAns, mc:mc,
-              dec:dec, fix:fix, money:money, ineq:ineq, stdform:stdform, root:root,
+              dec:dec, fix:fix, money:money, an:an, ineq:ineq, stdform:stdform, root:root,
               toBase:toBase, fromBase:fromBase,
               // diagram primitives + the shared palette
               dia:dia, ln:ln, txt:txt, polyg:polyg, rect:rect, circ:circ,

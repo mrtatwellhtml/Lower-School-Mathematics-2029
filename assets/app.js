@@ -203,8 +203,16 @@
     if(g.level==null)  g.level=item.level;
     return g;
   }
-  var LVRANK={ Basic:0, Core:1, Challenge:2 };
+  /* Practice is tiered so a student can work all the way up a topic in one sitting.
+     Anything without an explicit level counts as Intermediate — that is the standard
+     the syllabus asks for, and it keeps older content working unchanged. */
+  var TIERS=['Basic','Intermediate','Advanced'];
+  var LVRANK={ Basic:0, Intermediate:1, Advanced:2 };
+  var TIERNOTE={ Basic:'Start here — one step at a time.',
+                 Intermediate:'The standard the syllabus asks for.',
+                 Advanced:'Stretch yourself — more steps, or a twist.' };
   function lvOf(item){ return (item&&LVRANK[item.level]!=null)?LVRANK[item.level]:1; }
+  function lvName(item){ return TIERS[lvOf(item)]; }
 
   function buildPractice(t){
     var items=t.content.practice.slice().sort(function(a,b){ return lvOf(a)-lvOf(b); });
@@ -226,10 +234,16 @@
     function fill(){
       qs=items.map(resolveItem); inputs=[];
       qwrap.innerHTML='';
+      var lastTier=null;
       qs.forEach(function(q,i){
+        var tier=lvName(q);
+        if(tier!==lastTier){                      // a heading each time the level steps up
+          var th=el('div','tierhead tier-'+tier.toLowerCase());
+          th.innerHTML='<b>'+tier+'</b><span>'+TIERNOTE[tier]+'</span>';
+          qwrap.appendChild(th); lastTier=tier;
+        }
         var pq=el('div','pq'); pq.dataset.i=i;
-        var badge=q.level?'<span class="plevel plevel-'+q.level.toLowerCase()+'">'+q.level+'</span>':'';
-        var body='<div class="qn">'+badge+(i+1)+'. '+q.q+'</div>';
+        var body='<div class="qn">'+(i+1)+'. '+q.q+'</div>';
         if(q.type==='mc'){
           body+='<div class="opts">'+q.options.map(function(o,j){
             return '<label><input type="radio" name="q'+i+'" value="'+j+'"> <span>'+o+'</span></label>';

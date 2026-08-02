@@ -47,6 +47,9 @@ assets/
   content-geometry.js    Same pattern — Geometry strand (+ vec() for column vectors).
   content-sets.js        Same pattern — Sets, Relations & Functions (+ venn2()).
   content-statistics.js  Same pattern — Statistics & Probability (+ bars(), pie()).
+  content-practice-tiers.js  The TIER LAYER. Loaded LAST, after every content file.
+                         Appends Basic and Advanced generators to each topic so all 70
+                         offer all three levels. Never replaces — only pushes.
 tools/
   verify.js     Headless test suite. `node tools/verify.js` — run it after any change.
 ```
@@ -111,6 +114,22 @@ practice:[
   }},
 ]
 ```
+
+### Difficulty tiers
+
+Every topic offers three levels, and `app.js` sorts them and prints a heading for each so
+a student works straight down the page:
+
+```js
+{ level:'Basic',        gen:function(){…} }   // one step, small numbers
+{ level:'Intermediate', gen:function(){…} }   // the standard the syllabus asks for
+{ level:'Advanced',     gen:function(){…} }   // several steps, or a twist
+```
+
+An item with **no** `level` counts as Intermediate — that is why the original per-strand
+practice needed no editing when tiers were introduced. The Basic and Advanced items live
+in `content-practice-tiers.js`, which loads last and appends to each topic's array.
+`tools/verify.js` fails if any topic is missing one of the three tiers.
 
 Rules that keep generated questions correct:
 - **Derive the question from the answer, not the other way round.** Choose the root `x`,

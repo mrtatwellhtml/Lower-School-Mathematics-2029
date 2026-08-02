@@ -75,7 +75,7 @@
           return {type:'mc', q:'What is the name of a polygon with '+p[0]+' sides?',
             options:o.options, answer:o.answer, hint:'Count up from triangle (3) and quadrilateral (4).'};
         }
-        return {type:'text', q:'How many sides does a '+p[1]+' have?', answer:[String(p[0])],
+        return {type:'text', q:'How many sides does '+Q.an(p[1])+' have?', answer:[String(p[0])],
           hint:'The name tells you the number of sides.'};
       }},
       {gen:function(){
@@ -93,7 +93,7 @@
                     ['octahedron',8,12,6],['pentagonal pyramid',6,10,6],['hexagonal pyramid',7,12,7],
                     ['cuboid',6,12,8],['heptagonal prism',9,21,14],['octagonal prism',10,24,16]];
         var s=Q.pick(solids);
-        return {type:'text', q:'A '+s[0]+' has '+s[1]+' faces and '+s[3]+
+        return {type:'text', q:Q.an(s[0]).charAt(0).toUpperCase()+Q.an(s[0]).slice(1)+' has '+s[1]+' faces and '+s[3]+
             ' vertices. Use Euler\'s rule F + V − E = 2 to find the number of edges.',
           answer:[String(s[2])],
           hint:s[1]+' + '+s[3]+' − E = 2, so E = '+s[1]+' + '+s[3]+' − 2.'};
@@ -447,7 +447,7 @@
         var shapes=[['square',4],['rectangle',2],['equilateral triangle',3],['isosceles triangle',1],
                     ['regular pentagon',5],['regular hexagon',6],['regular octagon',8],['rhombus',2]];
         var s=Q.pick(shapes);
-        return {type:'text', q:'How many lines of symmetry does a '+s[0]+' have?',
+        return {type:'text', q:'How many lines of symmetry does '+Q.an(s[0])+' have?',
           answer:[String(s[1])],
           hint:'A regular polygon with n sides has n lines of symmetry.'};
       }},

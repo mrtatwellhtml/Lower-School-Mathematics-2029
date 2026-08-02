@@ -28,7 +28,8 @@ math-review-site/
 │   ├── content-measurement.js  Notes/examples/practice — Measurement strand (Forms 1–3)
 │   ├── content-geometry.js     Notes/examples/practice — Geometry strand (+ SVG diagrams)
 │   ├── content-sets.js         Notes/examples/practice — Sets, Relations & Functions
-│   └── content-statistics.js   Notes/examples/practice — Statistics & Probability
+│   ├── content-statistics.js   Notes/examples/practice — Statistics & Probability
+│   └── content-practice-tiers.js  Basic + Advanced practice for every topic (loads last)
 ├── tools/verify.js         Headless test suite (node tools/verify.js)
 └── README.md
 ```
@@ -108,7 +109,11 @@ set('CODE', {
 Objectives and prerequisites are already supplied for all 70 topics from `data.js`, so you
 only ever write notes, examples and practice.
 
-## Practice questions regenerate
+## Practice: three levels, endlessly regenerated
+
+Every topic's practice is split into **Basic → Intermediate → Advanced**, each under its
+own heading, so a student can start where they are comfortable and work all the way up in
+one sitting. There are **711 practice items** across the 70 topics — about 10 per topic.
 
 Notes and worked examples are fixed, but every practice question is **generated from a
 formula with random numbers**. A student presses **↻ New questions** and gets a fresh set

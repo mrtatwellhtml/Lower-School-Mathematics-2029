@@ -43,7 +43,7 @@ global.alert = () => {};
 global.window = global;
 
 function load(f){ eval(fs.readFileSync(path.join(ROOT,'assets',f),'utf8')); }
-['data.js','qgen.js','content.js','content-algebra.js','content-measurement.js','content-geometry.js','content-sets.js','content-statistics.js','content-book-extra.js','app.js'].forEach(load);
+['data.js','qgen.js','content.js','content-algebra.js','content-measurement.js','content-geometry.js','content-sets.js','content-statistics.js','content-practice-tiers.js','app.js'].forEach(load);
 
 let fail = 0;
 function ok(cond, msg){ console.log((cond?'  PASS  ':'  FAIL  ')+msg); if(!cond) fail++; }
@@ -196,6 +196,26 @@ built.forEach(code => {
   ok(issues.length === 0, code+' '+t.name+(issues.length?' -> '+issues.join('; '):''));
 });
 
+console.log('== Practice tiers ==');
+{
+  const TIERS = ['Basic','Intermediate','Advanced'];
+  const missing = [];
+  built.forEach(code => {
+    const seen = new Set((C[code].content.practice||[]).map(p => p.level || 'Intermediate'));
+    const gaps = TIERS.filter(t => !seen.has(t));
+    if(gaps.length) missing.push(code+' missing '+gaps.join('+'));
+  });
+  ok(missing.length === 0, 'every topic offers Basic, Intermediate AND Advanced practice'+
+     (missing.length?'\n           -> '+missing.slice(0,8).join('\n           -> ')+
+      (missing.length>8?'\n           -> …and '+(missing.length-8)+' more':''):''));
+  const bad = [];
+  built.forEach(code => (C[code].content.practice||[]).forEach((p,i) => {
+    if(p.level && TIERS.indexOf(p.level) < 0) bad.push(code+'#'+(i+1)+' has unknown level "'+p.level+'"');
+  }));
+  ok(bad.length === 0, 'no practice item carries an unrecognised level'+
+     (bad.length?'\n           -> '+bad.slice(0,5).join('\n           -> '):''));
+}
+
 console.log('== Every practice item is generated ==');
 let staticItems = [];
 built.forEach(code => (C[code].content.practice||[]).forEach((p,i)=>{
@@ -314,8 +334,12 @@ console.log('== "New questions" regenerates in the real render path ==');
     if(qwrap.children.map(c=>c._html).join('|') !== before) changed = true;
   }
   ok(changed, 'pressing "New questions" produces a different question set');
-  ok(qwrap.children.length === C['3.6.7'].content.practice.length,
+  // qwrap holds tier headings as well as questions, so count only the question blocks
+  const qCount = qwrap.children.filter(c => c.className === 'pq').length;
+  const headCount = qwrap.children.filter(c => /tierhead/.test(c.className)).length;
+  ok(qCount === C['3.6.7'].content.practice.length,
      'and still renders exactly '+C['3.6.7'].content.practice.length+' questions (no duplication)');
+  ok(headCount === 3, 'the three tier headings are rendered (got '+headCount+')');
 }
 
 console.log(fail ? '\n'+fail+' FAILURE(S)' : '\nAll checks passed.');

@@ -155,9 +155,16 @@ sup{font-size:.72em}
 footer.site{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:.85rem;text-align:center}
 @media(max-width:560px){.hero h1{font-size:1.55rem}.overall{gap:14px}}
 
-/* Practice difficulty badges */
-.plevel{display:inline-block;font-size:.66rem;font-weight:700;text-transform:uppercase;
-  letter-spacing:.3px;padding:2px 8px;border-radius:20px;margin-right:8px;vertical-align:middle}
-.plevel-basic{background:#e8f5e9;color:#2e7d32}
-.plevel-core{background:#e7f0fb;color:#1F4E79}
-.plevel-challenge{background:#fdecea;color:#b3261e}
+/* Practice difficulty tiers — a heading introduces each level */
+.tierhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  margin:26px 0 4px;padding:9px 14px;border-radius:10px;border-left:5px solid}
+.tierhead:first-child{margin-top:8px}
+.tierhead b{font-size:1rem;letter-spacing:.2px}
+.tierhead span{color:var(--muted);font-size:.84rem}
+.tier-basic{background:#eaf6ec;border-left-color:#2e7d32}
+.tier-basic b{color:#2e7d32}
+.tier-intermediate{background:#e7f0fb;border-left-color:#1F4E79}
+.tier-intermediate b{color:#1F4E79}
+.tier-advanced{background:#fdecea;border-left-color:#b3261e}
+.tier-advanced b{color:#b3261e}
+@media(max-width:560px){.tierhead{flex-direction:column;gap:2px}}
