@@ -43,7 +43,7 @@ global.alert = () => {};
 global.window = global;
 
 function load(f){ eval(fs.readFileSync(path.join(ROOT,'assets',f),'utf8')); }
-['data.js','qgen.js','content.js','content-algebra.js','content-measurement.js','content-geometry.js','content-sets.js','content-statistics.js','content-practice-tiers.js','app.js'].forEach(load);
+['data.js','qgen.js','content.js','content-algebra.js','content-measurement.js','content-geometry.js','content-sets.js','content-statistics.js','content-practice-tiers.js','content-diagrams.js','content-exam-style.js','app.js'].forEach(load);
 
 let fail = 0;
 function ok(cond, msg){ console.log((cond?'  PASS  ':'  FAIL  ')+msg); if(!cond) fail++; }

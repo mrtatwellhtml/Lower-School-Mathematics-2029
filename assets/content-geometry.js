@@ -325,8 +325,9 @@
           options:o.options, answer:o.answer, hint:'Three equal angles sharing 180°.'};
       }},
       {gen:function(){
-        var a=Q.int(25,80), b=Q.int(25,80), c=180-a-b;
-        while(c<=0||c>=180){ a=Q.int(25,80); b=Q.int(25,80); c=180-a-b; }
+        var a,b,c;
+        do { a=Q.int(25,80); b=Q.int(25,80); c=180-a-b; }
+        while(c<=0||c>=180||a===b||b===c||a===c);   // scalene → unique longest side, no duplicate options
         var sides=[[a,'a'],[b,'b'],[c,'c']];
         var biggest=sides.reduce(function(x,y){ return x[0]>=y[0]?x:y; });
         var o=Q.mc('the side opposite the '+biggest[0]+'° angle',
