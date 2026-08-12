@@ -80,7 +80,8 @@
     var head=document.getElementById('shead');
     head.innerHTML='<div class="tag strand" style="background:'+col+';display:inline-block;margin-bottom:8px">'+glabel+'</div>'+
       '<h1 style="color:'+col+'">'+s.name+'</h1>'+
-      '<p>Select a topic to review its objectives, notes, worked examples and practice.</p>';
+      '<p>Select a topic to review its objectives, notes, worked examples and practice — '+
+      'or sit a <a href="paper.html?s='+id+'&g='+gkey+'"><b>whole-strand practice paper</b></a>.</p>';
     var list=document.getElementById('tlist');
     window.TOPIC_ORDER.filter(function(c){return C[c].strandId===id && forms.indexOf(C[c].form)>-1;}).forEach(function(c){
       var t=C[c], st=(prog[c]||{}).status||'none', built=!!t.content;
@@ -155,15 +156,13 @@
       root.appendChild(soon);
     }
 
-    // assessment / prove-it
+    // assessment / exam-paper
     var as=el('div','section');
-    as.innerHTML='<h2>Prove it</h2><p>When you can meet every objective, take the Mastery Quiz in Google Classroom'+
-      ' (about '+t.quizItems+' questions — score '+(Progress.MASTERY*100)+'% to master this topic).</p>';
-    var quizBtn=el('a','btn big',(t.classroomUrl?'Open Mastery Quiz →':'Mastery Quiz — link coming soon'));
-    if(t.classroomUrl){ quizBtn.href=t.classroomUrl; quizBtn.target='_blank'; quizBtn.rel='noopener'; }
-    else { quizBtn.href='#'; quizBtn.onclick=function(ev){ ev.preventDefault();
-      alert('This quiz link has not been added yet. Set classroomUrl for "'+t.code+'" in assets/data.js.'); }; }
-    var quizP=el('p'); quizP.appendChild(quizBtn); as.appendChild(quizP);
+    as.innerHTML='<h2>Exam yourself</h2><p>When you can meet every objective, sit a <b>practice paper</b> —'+
+      ' a CSEC/NCSE-style set of questions on this topic, with marks, a timer and a print option.</p>';
+    var paperBtn=el('a','btn big','Take a practice paper →'); paperBtn.href='paper.html?id='+t.code;
+    var pp=el('p'); pp.appendChild(paperBtn); as.appendChild(pp);
+    if(t.classroomUrl){ var cq=el('p'); var cl=el('a','btn ghost','Or take the Classroom quiz'); cl.href=t.classroomUrl; cl.target='_blank'; cl.rel='noopener'; cq.appendChild(cl); as.appendChild(cq); }
     root.appendChild(as);
 
     // status control

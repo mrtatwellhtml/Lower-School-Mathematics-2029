@@ -168,3 +168,40 @@ footer.site{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);f
 .tier-advanced{background:#fdecea;border-left-color:#b3261e}
 .tier-advanced b{color:#b3261e}
 @media(max-width:560px){.tierhead{flex-direction:column;gap:2px}}
+
+/* Paper mode */
+.paperwrap{margin:18px 0 60px}
+.paper-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.paper-controls .clock{margin-left:auto;font-weight:700;color:var(--brand);font-variant-numeric:tabular-nums}
+.paper-sheet{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
+  padding:34px 40px;max-width:820px;margin:0 auto;font-family:Georgia,'Times New Roman',serif;color:#1a2733}
+.paper-head{text-align:center;border-bottom:2px solid #1a2733;padding-bottom:14px;margin-bottom:18px}
+.paper-code{font-size:.8rem;letter-spacing:2px;color:#5b6b7a}
+.paper-head h1{font-size:1.7rem;letter-spacing:3px;margin:6px 0 2px}
+.paper-head h2{font-size:1.15rem;font-weight:600;margin:2px 0;color:var(--brand)}
+.paper-sub{color:#5b6b7a;font-size:.9rem;margin-bottom:10px}
+.paper-meta{margin:8px auto;border-collapse:collapse;font-size:.9rem}
+.paper-meta td{border:1px solid #cbd5e0;padding:5px 16px}
+.paper-instr{font-size:.9rem;margin:12px 4px 0;text-align:left}
+.paper-q{display:flex;gap:12px;padding:14px 0;border-bottom:1px dashed #e2e9f1;page-break-inside:avoid}
+.paper-qnum{font-weight:700;min-width:26px}
+.paper-qbody{flex:1;position:relative}
+.paper-qtext{line-height:1.7}
+.paper-opts{margin:8px 0 0;padding-left:26px}
+.paper-opts li{padding:3px 0}
+.paper-answerline{color:#5b6b7a;margin-top:12px;font-size:.95rem}
+.paper-work{min-height:52px}
+.paper-marks{position:absolute;right:0;top:0;font-weight:700;color:#5b6b7a}
+.paper-key{margin-top:22px;border-top:2px solid #1a2733;padding-top:12px}
+.paper-key h3{margin:.2em 0;color:var(--brand)}
+.paper-key ol{padding-left:24px}
+.paper-key li{padding:3px 0}
+.paper-key .km{color:#9aa7b3;font-size:.8rem}
+.paper-total{font-weight:700;margin-top:8px}
+.paper-launch{display:inline-flex;align-items:center;gap:8px}
+@media print{
+  .no-print,header.site,.paper-controls,footer.site{display:none !important}
+  body{background:#fff}
+  .paper-sheet{box-shadow:none;border:none;max-width:none;padding:0}
+  .paper-key{page-break-before:always}
+}
