@@ -160,6 +160,21 @@ in question text — the verifier checks this.
 Mastery threshold = **80%** (`MASTERY` const). Scoring 80%+ on on-site practice unlocks a
 "Mark Mastered" shortcut. Teacher-facing mastery comes from Classroom, not this store.
 
+## Foundation Workbook (`foundation/`)
+
+`foundation/` is a separate, self-contained daily-practice workbook for Form 3, linked
+from the "Form 3 · Current Year" section on the home page. It is **built elsewhere** —
+in `../Topic Pages/Foundation Workbook/source` — not maintained as part of this
+repo's own content pipeline (no `data.js`/`content.js` involvement).
+
+- `foundation/index.html` is the whole workbook (single file, self-contained). To update
+  it, rebuild from the source project and **replace `foundation/index.html` only**.
+- `foundation/config.js` holds the Google Apps Script Web app URL (`endpoint`) that the
+  workbook posts student answers to. **Never overwrite it** when updating the workbook —
+  it isn't part of the generated build and holds this teacher's live deployment URL.
+- The Apps Script side (`Foundation_Responses.gs`) is deployed separately in Google Apps
+  Script and is not part of this site's source.
+
 ## Status — done vs. next
 
 **Done — content is COMPLETE.** All **70 of 70 topics** have objectives, prerequisites,
