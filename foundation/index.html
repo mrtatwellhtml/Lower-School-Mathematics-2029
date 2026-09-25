@@ -1246,15 +1246,16 @@ body.paper #tokgal{display:block;position:absolute;left:-9999px;top:0;background
 
   /* ================= SENDING RESULTS TO THE TEACHER (optional) =================
      Off unless window.WB_CONFIG.endpoint is set (see config.js on the website).
-     Students identify with a CODE (class + register number, e.g. 3B-14) — never a name. */
+     Students identify with the name they typed above (the same "Your name" box used
+     for the on-screen greeting) — sent to the teacher's Google Sheet with their answers. */
   var CFG = window.WB_CONFIG || {}, LOG = !!(CFG.endpoint && MODE === 'screen');
   var QKEY = 'f3-foundation-wb-queue', sending = false;
   function loadQ() { try { return JSON.parse(localStorage.getItem(QKEY)) || []; } catch (e) { return []; } }
   function saveQ(q) { try { localStorage.setItem(QKEY, JSON.stringify(q.slice(-2000))); } catch (e) { /* ignore */ } }
   if (!S.dev) { S.dev = 'd' + Math.random().toString(36).slice(2, 10); }
   function logEv(ev) {
-    if (!LOG || !S.code) return;
-    ev.code = S.code; ev.dev = S.dev; ev.ts = Date.now();
+    if (!LOG || !String(S.name || '').trim()) return;
+    ev.name = S.name.trim(); ev.dev = S.dev; ev.ts = Date.now();
     var q = loadQ(); q.push(ev); saveQ(q); flush();
   }
   function flush() {
@@ -1282,12 +1283,6 @@ body.paper #tokgal{display:block;position:absolute;left:-9999px;top:0;background
     }
     return String(v).slice(0, 200);
   }
-  function validCode(cls, num) {
-    cls = String(cls || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
-    num = String(num || '').replace(/[^0-9]/g, '').slice(0, 2);
-    return cls && num && +num > 0 ? cls + '-' + (+num) : '';
-  }
-
   function dayStats(day) {
     var ds = S.d[day.day] || { i: {} }, tot = 0, ok = 0, att = 0, ex = 0, exOk = 0;
     SECTIONS.forEach(function (sec) {
@@ -1442,11 +1437,10 @@ body.paper #tokgal{display:block;position:absolute;left:-9999px;top:0;background
     var h = topbar('<a class="brand" href="#"><span class="brand-mark">F3</span>Foundation</a>');
     h += '<section class="hero"><div><h1 class="hello">Hi' + (S.name ? ', <span class="nm">' + esc(S.name.split(' ')[0]) + '</span>' : ' there') + '</h1>' +
       '<p class="hero-sub">One short day at a time. Fix a basic skill, learn one new idea, about 25 minutes.</p>' +
-      '<div class="namebox"><label for="stu-name">Your name</label><input id="stu-name" autocomplete="off" value="' + esc(S.name || '') + '" placeholder="Type your name"></div></div>' +
+      '<div class="namebox"><label for="stu-name">Your name</label><input id="stu-name" autocomplete="off" value="' + esc(S.name || '') + '" placeholder="Type your name"></div>' +
+      (LOG ? '<p id="namehint" class="sync' + (S.name && S.name.trim() ? ' ok' : ' wait') + '">' + (S.name && S.name.trim() ? 'Your answers go to your teacher.' : 'Type your name above so your teacher can see your work.') + '</p>' : '') + '</div>' +
       '<div class="ring" role="img" aria-label="' + T.done + ' of ' + DAYS.length + ' days done"><svg viewBox="0 0 120 120"><circle class="rb" cx="60" cy="60" r="52"/><circle class="rf" cx="60" cy="60" r="52" stroke-dasharray="' + C2 + '" stroke-dashoffset="' + (C2 * (1 - pct)) + '"/></svg><div class="ring-t"><b>' + T.done + '</b><span>of ' + DAYS.length + ' days</span></div></div>' +
       '<a class="cta" href="#day' + nd.day + '"><div><small>' + (started ? 'Keep going' : (T.done ? 'Up next' : 'Start here')) + '</small><strong>Day ' + nd.day + ' · ' + esc(nd.title) + '</strong></div><span class="go">' + ICON.next + '</span></a></section>';
-    if (LOG && !S.code) h += '<section class="codecard"><h2>Your class code</h2><p>Your teacher gave you a code: your class and your register number. It lets your teacher see your work. <b>Do not type your name.</b></p>' +
-      '<div class="code-row"><label>Class<input id="code-cls" maxlength="4" autocomplete="off" placeholder="3B"></label><label>Register no.<input id="code-num" inputmode="numeric" maxlength="2" autocomplete="off" placeholder="14"></label><button type="button" class="btn check code-save">Save my code</button></div><p class="code-err" id="code-err" aria-live="polite"></p></section>';
     h += '<div class="stats"><div class="stat xp"><b>' + T.xp + '</b><span>XP earned</span></div><div class="stat st"><b>' + T.stars + '</b><span>Stars</span></div><div class="stat"><b>' + T.correct + '</b><span>Questions right</span></div></div>';
     h += '<ol class="flow">' + SECTIONS.map(function (s) { return '<li>' + s.name + ' <span>' + s.min + 'm</span></li>'; }).join('') + '<li>Show your teacher</li></ol>';
     topicOrder().forEach(function (g) {
@@ -1460,7 +1454,7 @@ body.paper #tokgal{display:block;position:absolute;left:-9999px;top:0;background
       });
       h += '</div></section>';
     });
-    h += '<footer class="foot"><a href="#teacher" class="linkbtn">Teacher summary</a>' + (LOG && S.code ? '<span>Your code: <b>' + esc(S.code) + '</b> · your answers go to your teacher.</span><button type="button" class="linkbtn code-change">Change code</button>' : '<span>Your work saves on this device only.</span>') + '</footer>';
+    h += '<footer class="foot"><a href="#teacher" class="linkbtn">Teacher summary</a>' + (LOG && S.name && S.name.trim() ? '<span>Your answers go to your teacher.</span>' : '<span>Your work saves on this device only.</span>') + '</footer>';
     app.innerHTML = h;
     window.scrollTo(0, 0);
   }
@@ -1509,7 +1503,7 @@ body.paper #tokgal{display:block;position:absolute;left:-9999px;top:0;background
       }).join('') + '</fieldset>' +
       '<label class="qlab" for="qn">My question for my teacher</label><textarea id="qn" rows="2" placeholder="Which question confused you? What do you want help with?">' + esc(ds.qn || '') + '</textarea>' +
       '<button type="button" class="btn big markdone' + (ds.done ? ' is-done' : '') + '">' + (ds.done ? ICON.check + 'Day done' : 'Finish this day') + '</button>' +
-      (LOG ? (S.code ? '<p id="sync" class="sync"></p>' : '<p class="sync wait">Add your class code on the home page so your teacher can see this day.</p>') : '') + '</section>';
+      (LOG ? (S.name && S.name.trim() ? '<p id="sync" class="sync"></p>' : '<p class="sync wait">Add your name on the home page so your teacher can see this day.</p>') : '') + '</section>';
     h += '<nav class="pager">' + (idx > 0 ? '<a href="#day' + DAYS[idx - 1].day + '">' + ICON.back + 'Day ' + DAYS[idx - 1].day + '</a>' : '<span></span>') + (idx < DAYS.length - 1 ? '<a href="#day' + DAYS[idx + 1].day + '">Day ' + DAYS[idx + 1].day + ICON.next + '</a>' : '<span></span>') + '</nav>';
     h += '</article>';
     app.innerHTML = h;
@@ -1677,10 +1671,6 @@ body.paper #tokgal{display:block;position:absolute;left:-9999px;top:0;background
     if (cf) { var ds = dayState(cur.day); ds.conf = cf.dataset.c; app.querySelectorAll('.cf').forEach(function (b) { b.classList.toggle('sel', b === cf); }); save(); return; }
     if (t.closest('.markdone')) { var ds2 = dayState(cur.day); ds2.done = true; save(); var mb = t.closest('.markdone'); mb.classList.add('is-done'); mb.innerHTML = ICON.check + 'Day done'; refreshChips();
       var fs = dayStats(cur); logEv({ t: 'finish', day: cur.day, title: cur.title, ok: fs.ok, tot: fs.tot, exOk: fs.exOk, ex: fs.ex, feel: CONF[ds2.conf] || '', qn: String(ds2.qn || '').slice(0, 500) }); setSync(); return; }
-    if (t.closest('.code-save')) { var cd = validCode(document.getElementById('code-cls').value, document.getElementById('code-num').value);
-      var ce = document.getElementById('code-err'); if (!cd) { ce.textContent = 'Type your class (like 3B) and your register number.'; return; }
-      S.code = cd; save(); renderHome(); flush(); return; }
-    if (t.closest('.code-change')) { S.code = ''; save(); renderHome(); return; }
     if (t.closest('.theme')) { var nt = themeNow() === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', nt); try { localStorage.setItem('f3wb-theme', nt); } catch (x) { /* ignore */ } t.closest('.theme').innerHTML = nt === 'dark' ? ICON.sun : ICON.moon; return; }
     var jp = t.closest('[data-jump]');
     if (jp) { e.preventDefault(); var tg = document.getElementById(jp.dataset.jump); if (tg) tg.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
@@ -1692,7 +1682,9 @@ body.paper #tokgal{display:block;position:absolute;left:-9999px;top:0;background
   }
   function onInput(e) {
     var t = e.target;
-    if (t.id === 'stu-name') { S.name = t.value; save(); return; }
+    if (t.id === 'stu-name') { S.name = t.value; save();
+      var nh = document.getElementById('namehint'); if (nh) { var has = !!S.name.trim(); nh.textContent = has ? 'Your answers go to your teacher.' : 'Type your name above so your teacher can see your work.'; nh.className = 'sync' + (has ? ' ok' : ' wait'); if (has) flush(); }
+      return; }
     if (t.id === 'qn' && cur) { dayState(cur.day).qn = t.value; save(); return; }
     var el = t.closest('.item');
     if (el && cur) {
