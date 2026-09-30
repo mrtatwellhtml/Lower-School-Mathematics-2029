@@ -71,6 +71,9 @@ button{font:inherit;color:inherit}
 .namebox label{font-size:14px;font-weight:700;color:var(--muted)}
 .namebox input{font:inherit;font-size:16px;padding:9px 14px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface-2);color:var(--ink);min-width:0;flex:1;max-width:260px}
 .namebox input:focus{border-color:var(--accent);outline:0}
+.namebox input[aria-invalid="true"]{border-color:var(--no)}
+.name-gate{margin:10px 0 0;padding:10px 12px;border-left:3px solid var(--accent);border-radius:6px;background:var(--accent-soft);font-size:14px}
+.name-continue{margin-top:10px}
 .ring{position:relative;width:128px;height:128px}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
 .ring .rb{fill:none;stroke:var(--line);stroke-width:11}
@@ -1249,7 +1252,7 @@ body.paper #tokgal{display:block;position:absolute;left:-9999px;top:0;background
      Students identify with the name they typed above (the same "Your name" box used
      for the on-screen greeting) — sent to the teacher's Google Sheet with their answers. */
   var CFG = window.WB_CONFIG || {}, LOG = !!(CFG.endpoint && MODE === 'screen');
-  var QKEY = 'f3-foundation-wb-queue', sending = false;
+  var QKEY = 'f3-foundation-wb-queue', sending = false, PENDING_DAY = 0;
   function loadQ() { try { return JSON.parse(localStorage.getItem(QKEY)) || []; } catch (e) { return []; } }
   function saveQ(q) { try { localStorage.setItem(QKEY, JSON.stringify(q.slice(-2000))); } catch (e) { /* ignore */ } }
   if (!S.dev) { S.dev = 'd' + Math.random().toString(36).slice(2, 10); }
@@ -1437,8 +1440,9 @@ body.paper #tokgal{display:block;position:absolute;left:-9999px;top:0;background
     var h = topbar('<a class="brand" href="#"><span class="brand-mark">F3</span>Foundation</a>');
     h += '<section class="hero"><div><h1 class="hello">Hi' + (S.name ? ', <span class="nm">' + esc(S.name.split(' ')[0]) + '</span>' : ' there') + '</h1>' +
       '<p class="hero-sub">One short day at a time. Fix a basic skill, learn one new idea, about 25 minutes.</p>' +
-      '<div class="namebox"><label for="stu-name">Your name</label><input id="stu-name" autocomplete="off" value="' + esc(S.name || '') + '" placeholder="Type your name"></div>' +
-      (LOG ? '<p id="namehint" class="sync' + (S.name && S.name.trim() ? ' ok' : ' wait') + '">' + (S.name && S.name.trim() ? 'Your answers go to your teacher.' : 'Type your name above so your teacher can see your work.') + '</p>' : '') + '</div>' +
+      '<div class="namebox"><label for="stu-name">Your name</label><input id="stu-name" type="text" autocomplete="name"' + (LOG ? ' required aria-required="true"' : '') + ' value="' + esc(S.name || '') + '" placeholder="Type your name"></div>' +
+      (LOG ? '<p id="namehint" class="sync' + (S.name && S.name.trim() ? ' ok' : ' wait') + '">' + (S.name && S.name.trim() ? 'Name saved on this device. Your answers can be sent to your teacher.' : 'Enter your name before starting so your teacher can see your work.') + '</p>' : '') +
+      (LOG && PENDING_DAY ? '<p class="name-gate" role="alert">Please enter your name before starting Day ' + PENDING_DAY + '. It will be remembered on this device.</p><button type="button" class="btn name-continue">Continue to Day ' + PENDING_DAY + '</button>' : '') + '</div>' +
       '<div class="ring" role="img" aria-label="' + T.done + ' of ' + DAYS.length + ' days done"><svg viewBox="0 0 120 120"><circle class="rb" cx="60" cy="60" r="52"/><circle class="rf" cx="60" cy="60" r="52" stroke-dasharray="' + C2 + '" stroke-dashoffset="' + (C2 * (1 - pct)) + '"/></svg><div class="ring-t"><b>' + T.done + '</b><span>of ' + DAYS.length + ' days</span></div></div>' +
       '<a class="cta" href="#day' + nd.day + '"><div><small>' + (started ? 'Keep going' : (T.done ? 'Up next' : 'Start here')) + '</small><strong>Day ' + nd.day + ' · ' + esc(nd.title) + '</strong></div><span class="go">' + ICON.next + '</span></a></section>';
     h += '<div class="stats"><div class="stat xp"><b>' + T.xp + '</b><span>XP earned</span></div><div class="stat st"><b>' + T.stars + '</b><span>Stars</span></div><div class="stat"><b>' + T.correct + '</b><span>Questions right</span></div></div>';
@@ -1612,6 +1616,18 @@ body.paper #tokgal{display:block;position:absolute;left:-9999px;top:0;background
 
   function onClick(e) {
     var t = e.target;
+    if (t.closest('.name-continue')) {
+      var nameInput = document.getElementById('stu-name');
+      if (!nameInput || !String(S.name || '').trim()) {
+        if (nameInput) { nameInput.setAttribute('aria-invalid', 'true'); nameInput.focus(); }
+        var nameHint = document.getElementById('namehint');
+        if (nameHint) { nameHint.textContent = 'Enter your name before you continue.'; nameHint.className = 'sync wait'; }
+        return;
+      }
+      var requestedDay = PENDING_DAY; PENDING_DAY = 0;
+      if (requestedDay) renderDay(requestedDay);
+      return;
+    }
     var a = t.closest('a[data-day]');
     var el = t.closest('.item');
     if (t.closest('.printday')) { printDay(cur); return; }
@@ -1683,7 +1699,7 @@ body.paper #tokgal{display:block;position:absolute;left:-9999px;top:0;background
   function onInput(e) {
     var t = e.target;
     if (t.id === 'stu-name') { S.name = t.value; save();
-      var nh = document.getElementById('namehint'); if (nh) { var has = !!S.name.trim(); nh.textContent = has ? 'Your answers go to your teacher.' : 'Type your name above so your teacher can see your work.'; nh.className = 'sync' + (has ? ' ok' : ' wait'); if (has) flush(); }
+      var nh = document.getElementById('namehint'); if (nh) { var has = !!S.name.trim(); if (has) t.removeAttribute('aria-invalid'); nh.textContent = has ? 'Name saved on this device. Your answers can be sent to your teacher.' : 'Enter your name before starting so your teacher can see your work.'; nh.className = 'sync' + (has ? ' ok' : ' wait'); if (has) flush(); }
       return; }
     if (t.id === 'qn' && cur) { dayState(cur.day).qn = t.value; save(); return; }
     var el = t.closest('.item');
@@ -1851,9 +1867,17 @@ body.paper #tokgal{display:block;position:absolute;left:-9999px;top:0;background
   /* ================= ROUTER ================= */
   function route() {
     var hsh = (location.hash || '').replace('#', '');
-    if (/^day\d+$/.test(hsh)) renderDay(+hsh.slice(3));
-    else if (hsh === 'teacher') renderTeacher();
-    else renderHome();
+    if (/^day\d+$/.test(hsh)) {
+      var requestedDay = +hsh.slice(3);
+      if (LOG && !String(S.name || '').trim()) {
+        PENDING_DAY = requestedDay; renderHome();
+        var nameInput = document.getElementById('stu-name');
+        if (nameInput) { nameInput.focus(); nameInput.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+        return;
+      }
+      PENDING_DAY = 0; renderDay(requestedDay);
+    } else if (hsh === 'teacher') { PENDING_DAY = 0; renderTeacher(); }
+    else { PENDING_DAY = 0; renderHome(); }
   }
   function init() {
     app = document.getElementById('app');
