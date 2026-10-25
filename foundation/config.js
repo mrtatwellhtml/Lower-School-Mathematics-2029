@@ -3,5 +3,6 @@
    Leave it empty ("") and the workbook works exactly the same but sends nothing.
    Students send the name they type in the workbook, plus their answers. */
 window.WB_CONFIG = {
-  endpoint: "https://script.google.com/macros/s/AKfycbwpcY9Ew3oZYAxxVJa-hAUa_uCLGEUmRBDEGo5spioo-tKY2BJ7QpVDuKvXE3TcA4nZKg/exec"
+  endpoint: "https://script.google.com/macros/s/AKfycbwpcY9Ew3oZYAxxVJa-hAUa_uCLGEUmRBDEGo5spioo-tKY2BJ7QpVDuKvXE3TcA4nZKg/exec",
+  monitor: true   // also send the same answers and finished days to the tutor's Student Monitor app
 };
