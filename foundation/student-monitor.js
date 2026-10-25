@@ -96,8 +96,15 @@
   }
   function status(entry, state) { if (entry.loud && cfg && cfg.onStatus) try { cfg.onStatus(state); } catch (e) { /* ignore */ } }
 
+  // A page served from this computer (a preview, a site's own browser tests) never sends to the real database,
+  // so test students cannot appear in the monitor. Tests that point `host` at the emulator, or set
+  // window.SMON_ALLOW_LOCAL, still send.
+  function localPreview() {
+    return !cfg.host && !window.SMON_ALLOW_LOCAL && /^(localhost|127\.0\.0\.1|\[::1\]|)$/.test(location.hostname || '');
+  }
+
   function flush() {
-    if (flushing || !cfg || (navigator.onLine === false)) return;
+    if (flushing || !cfg || (navigator.onLine === false) || localPreview()) return;
     var q = read(QKEY, []), sum = read(SUMKEY, null);
     if (!q.length && !sum) return;
     flushing = true;
