@@ -174,6 +174,14 @@ repo's own content pipeline (no `data.js`/`content.js` involvement).
   it isn't part of the generated build and holds this teacher's live deployment URL.
 - The Apps Script side (`Foundation_Responses.gs`) is deployed separately in Google Apps
   Script and is not part of this site's source.
+- **Student Monitor:** `foundation/student-monitor.js` is the tutor's shared tracker (copy it
+  unchanged from `..\..\Student Monitor\tracker\`); `config.js` `monitor: true` turns it on. The
+  workbook then also sends the same answers and finished days, plus time on each day, to the
+  monitor app (site id `form3-foundation`), beside the Sheet. The hooks are in the source
+  (`build/app.js`, `build/build_html.py`), so a rebuild keeps them.
+- The rest of this site (topics, papers, `assets/analytics.js`) deliberately sends **no names**
+  (class code only) and is **not** connected to the Student Monitor. Keep it that way unless
+  the tutor decides otherwise.
 
 ## Status — done vs. next
 
